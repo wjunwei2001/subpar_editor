@@ -451,6 +451,29 @@ body {
   font-size: 14px;
 }
 
+.lsp-mode {
+  cursor: pointer;
+  padding: 0 8px;
+  border-radius: 3px;
+  transition: background-color 0.15s;
+}
+
+.lsp-mode:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.lsp-mode.lsp {
+  color: #4ec9b0;
+}
+
+.lsp-mode.off {
+  color: #808080;
+}
+
+.lsp-mode.random {
+  color: #dcdcaa;
+}
+
 /* Random Decorator Styles */
 .random-squiggle-error {
   text-decoration: underline wavy #f44336;
@@ -465,27 +488,48 @@ body {
 }
 
 .random-highlight-1 {
-  background-color: rgba(255, 235, 59, 0.3);
+  background-color: rgba(255, 235, 59, 0.4);
 }
 
 .random-highlight-2 {
-  background-color: rgba(156, 39, 176, 0.3);
+  background-color: rgba(156, 39, 176, 0.4);
 }
 
 .random-highlight-3 {
-  background-color: rgba(0, 188, 212, 0.3);
+  background-color: rgba(0, 188, 212, 0.4);
 }
 
-.random-error {
-  color: #f44336;
+/* Random text colors - override syntax highlighting */
+.random-text-red {
+  color: #ff5555 !important;
 }
 
-.random-warning {
-  color: #ff9800;
+.random-text-green {
+  color: #50fa7b !important;
 }
 
-.random-info {
-  color: #2196f3;
+.random-text-blue {
+  color: #8be9fd !important;
+}
+
+.random-text-yellow {
+  color: #f1fa8c !important;
+}
+
+.random-text-purple {
+  color: #bd93f9 !important;
+}
+
+.random-text-cyan {
+  color: #00ffff !important;
+}
+
+.random-text-orange {
+  color: #ffb86c !important;
+}
+
+.random-text-pink {
+  color: #ff79c6 !important;
 }
 
 /* Preferences Panel */

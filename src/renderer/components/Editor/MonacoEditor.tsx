@@ -179,23 +179,48 @@ export function MonacoEditor() {
     };
   }, []);
 
-  // Manage random decorator based on lspMode
+  // Manage LSP mode changes - toggle Monaco's built-in validation
   useEffect(() => {
     if (!editorRef.current) return;
 
+    const model = editorRef.current.getModel();
+
+    // Configure Monaco's built-in TypeScript/JavaScript diagnostics
+    // Only disable for 'random' mode - keep baseline for both 'lsp' and 'off'
+    const diagnosticsEnabled = lspMode !== 'random';
+
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: !diagnosticsEnabled,
+      noSyntaxValidation: !diagnosticsEnabled,
+    });
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: !diagnosticsEnabled,
+      noSyntaxValidation: !diagnosticsEnabled,
+    });
+
+    // Clear all markers only when switching to 'random' mode
+    if (lspMode === 'random' && model) {
+      monaco.editor.setModelMarkers(model, 'lsp', []);
+      monaco.editor.setModelMarkers(model, 'typescript', []);
+      monaco.editor.setModelMarkers(model, 'javascript', []);
+    }
+
     if (lspMode === 'random') {
-      // Start random decorator
-      if (!randomDecoratorRef.current) {
-        randomDecoratorRef.current = new RandomDecorator(editorRef.current, {
-          intervalMs: 2500,
-          maxDecorations: 6,
-        });
-      }
-      randomDecoratorRef.current.start();
-    } else {
-      // Stop random decorator
+      const editor = editorRef.current;
+      // Always recreate decorator to ensure fresh state
       if (randomDecoratorRef.current) {
         randomDecoratorRef.current.stop();
+      }
+      randomDecoratorRef.current = new RandomDecorator(editor, {
+        intervalMs: 400,      // Update every 400ms
+        maxDecorations: 40,   // Up to 40 decorations at once
+      });
+      randomDecoratorRef.current.start();
+    } else {
+      // Stop and clear random decorator
+      if (randomDecoratorRef.current) {
+        randomDecoratorRef.current.stop();
+        randomDecoratorRef.current = null;
       }
     }
 
