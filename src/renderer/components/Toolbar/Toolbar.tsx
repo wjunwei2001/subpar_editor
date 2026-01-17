@@ -1,9 +1,11 @@
 import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
+import { useGachaStore } from '../../store/gachaStore';
 
 export function Toolbar() {
   const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
   const { refreshStatus } = useGitStore();
+  const { openLootbox } = useGachaStore();
 
   const activeFileData = getActiveFileData();
   const isDirty = activeFileData?.isDirty || false;
@@ -75,6 +77,13 @@ export function Toolbar() {
       {currentFolder && (
         <span className="current-folder">{currentFolder}</span>
       )}
+      <button
+        onClick={openLootbox}
+        title="Open Lootbox"
+        className="lootbox-button"
+      >
+        <span>🎰</span>
+      </button>
       <button
         onClick={() => setPreferencesOpen(true)}
         title="Preferences"

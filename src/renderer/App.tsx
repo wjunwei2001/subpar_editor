@@ -7,6 +7,7 @@ import { Terminal } from './components/Terminal/Terminal';
 import { GitPanel } from './components/Git/GitPanel';
 import { StatusBar } from './components/StatusBar/StatusBar';
 import { Preferences } from './components/Preferences/Preferences';
+import { LootboxModal } from './components/Lootbox';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 
@@ -90,6 +91,7 @@ function App() {
         isOpen={preferencesOpen}
         onClose={() => setPreferencesOpen(false)}
       />
+      <LootboxModal />
     </div>
   );
 }
