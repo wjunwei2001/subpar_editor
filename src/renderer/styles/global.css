@@ -14,6 +14,13 @@
   --accent: #007acc;
   --border: #3c3c3c;
   --hover: #2a2d2e;
+
+  /* Rarity colors for gacha system */
+  --rarity-common: #9e9e9e;
+  --rarity-uncommon: #4caf50;
+  --rarity-rare: #2196f3;
+  --rarity-epic: #9c27b0;
+  --rarity-legendary: #ff9800;
 }
 
 /* Light Theme */
@@ -154,6 +161,27 @@ body {
   background: none;
   border: none;
   padding: 6px 8px;
+}
+
+.toolbar .lootbox-button {
+  background: linear-gradient(145deg, #4a3a1a, #3a2a0d);
+  border: 2px solid #ff9800;
+  padding: 6px 12px;
+  animation: lootbox-glow 2s ease-in-out infinite;
+}
+
+.toolbar .lootbox-button:hover {
+  background: linear-gradient(145deg, #5a4a2a, #4a3a1d);
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+}
+
+@keyframes lootbox-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+  }
 }
 
 .main-content {

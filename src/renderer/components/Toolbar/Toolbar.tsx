@@ -11,6 +11,7 @@ export function Toolbar() {
   const [shopOpen, setShopOpen] = useState(false);
   const [gachaOpen, setGachaOpen] = useState(false);
   const { refreshStatus } = useGitStore();
+  const { openLootbox } = useGachaStore();
 
   const activeFileData = getActiveFileData();
   const isDirty = activeFileData?.isDirty || false;
@@ -95,6 +96,13 @@ export function Toolbar() {
       {currentFolder && (
         <span className="current-folder">{currentFolder}</span>
       )}
+      <button
+        onClick={openLootbox}
+        title="Open Lootbox"
+        className="lootbox-button"
+      >
+        <span>🎰</span>
+      </button>
       <button
         onClick={() => setPreferencesOpen(true)}
         title="Preferences"
