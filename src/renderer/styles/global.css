@@ -6,14 +6,24 @@
 
 /* Default (Dark Theme) */
 :root {
-  --bg-primary: #1e1e1e;
-  --bg-secondary: #252526;
-  --bg-tertiary: #2d2d30;
-  --text-primary: #cccccc;
-  --text-secondary: #858585;
-  --accent: #007acc;
-  --border: #3c3c3c;
-  --hover: #2a2d2e;
+  --bg-primary: #14151a;
+  --bg-secondary: #1b1d24;
+  --bg-tertiary: #232633;
+  --bg-elevated: #2b3040;
+  --text-primary: #e7e9ee;
+  --text-secondary: #a4acbb;
+  --accent: #7c4dff;
+  --accent-2: #20c997;
+  --border: #2f3645;
+  --panel-border: #3a4357;
+  --hover: #2b313f;
+  --focus: #a388ff;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-1: 0 6px 18px rgba(8, 10, 20, 0.35);
+  --shadow-2: 0 10px 28px rgba(8, 10, 20, 0.45);
+  --glow-accent: 0 0 16px rgba(124, 77, 255, 0.35);
 
   /* Rarity colors for gacha system */
   --rarity-common: #9e9e9e;
@@ -25,14 +35,18 @@
 
 /* Light Theme */
 .theme-light {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f3f3f3;
-  --bg-tertiary: #e8e8e8;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --accent: #0066cc;
-  --border: #d4d4d4;
-  --hover: #e5e5e5;
+  --bg-primary: #f7f8fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef1f7;
+  --bg-elevated: #ffffff;
+  --text-primary: #1d2433;
+  --text-secondary: #5a657a;
+  --accent: #6b4dff;
+  --accent-2: #12b886;
+  --border: #dbe0ea;
+  --panel-border: #d0d6e2;
+  --hover: #e8edf5;
+  --focus: #8d7bff;
 }
 
 /* Eye Pain Theme (Negative Mode) */
@@ -90,7 +104,7 @@ html, body, #root {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 13px;
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -100,15 +114,19 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: radial-gradient(circle at top, rgba(124, 77, 255, 0.08), transparent 50%);
 }
 
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(120deg, var(--bg-tertiary), var(--bg-secondary));
+  border-bottom: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-1);
+  position: relative;
+  z-index: 2;
 }
 
 .toolbar button {
@@ -116,41 +134,127 @@ body {
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-elevated);
   color: var(--text-primary);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 12px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
 }
 
 .toolbar button:hover {
   background-color: var(--hover);
+  box-shadow: var(--shadow-1);
+  transform: translateY(-1px);
 }
 
 .toolbar button.run-button {
-  background-color: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(120deg, var(--accent), #9f7bff);
+  border-color: transparent;
+  color: #ffffff;
 }
 
 .toolbar button.run-button:hover {
-  background-color: #005a9e;
+  background: linear-gradient(120deg, #8e6bff, #b592ff);
+}
+
+.toolbar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+  margin-right: 4px;
+  border-right: 1px solid var(--border);
+}
+
+.brand-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.brand-subtitle {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px;
+  border-right: 1px dashed var(--border);
+}
+
+.toolbar-group:last-of-type {
+  border-right: none;
+}
+
+.toolbar-gacha-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: var(--radius-lg);
+  background-color: rgba(124, 77, 255, 0.08);
+  border: 1px solid rgba(124, 77, 255, 0.2);
+}
+
+.toolbar .shop-btn,
+.toolbar .gacha-btn {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.toolbar .gacha-btn {
+  background: linear-gradient(130deg, rgba(124, 77, 255, 0.6), rgba(32, 201, 151, 0.6));
+  border-color: transparent;
+  color: #ffffff;
+  animation: gacha-float 2.6s ease-in-out infinite;
+}
+
+.toolbar .gacha-btn:hover {
+  box-shadow: var(--glow-accent);
+}
+
+@keyframes gacha-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.toolbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-secondary);
 }
 
 .toolbar .current-file {
   color: var(--text-primary);
-  font-size: 12px;
-  margin-left: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .toolbar .current-folder {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 300px;
+  max-width: 320px;
 }
 
 .toolbar-spacer {
@@ -159,7 +263,7 @@ body {
 
 .toolbar .settings-button {
   background: none;
-  border: none;
+  border: 1px solid var(--border);
   padding: 6px 8px;
 }
 
@@ -188,23 +292,47 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  gap: 1px;
+  background-color: var(--panel-border);
 }
 
 .sidebar {
   width: 250px;
   min-width: 150px;
   background-color: var(--bg-secondary);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--panel-border);
   overflow-y: auto;
 }
 
-.sidebar-header {
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px 12px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
+  background: linear-gradient(120deg, rgba(124, 77, 255, 0.12), transparent);
+}
+
+.pane-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.8px;
+}
+
+.pane-subtitle {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pane-icon {
+  font-size: 12px;
 }
 
 .editor-area {
@@ -212,14 +340,15 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: var(--bg-primary);
 }
 
 /* Tab Bar */
 .tab-bar {
   display: flex;
   align-items: center;
-  background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(120deg, var(--bg-tertiary), var(--bg-secondary));
+  border-bottom: 1px solid var(--panel-border);
   overflow-x: auto;
   min-height: 35px;
 }
@@ -237,12 +366,13 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: var(--bg-tertiary);
-  border-right: 1px solid var(--border);
+  background-color: transparent;
+  border-right: 1px solid var(--panel-border);
   cursor: pointer;
   white-space: nowrap;
   min-width: 100px;
   max-width: 200px;
+  position: relative;
 }
 
 .tab:hover {
@@ -251,8 +381,9 @@ body {
 
 .tab.active {
   background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--bg-primary);
-  margin-bottom: -1px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: -2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .tab-name {
@@ -263,6 +394,26 @@ body {
   text-overflow: ellipsis;
   font-size: 12px;
 }
+
+.tab-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background-color: rgba(124, 77, 255, 0.16);
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.tab-badge-js { color: #ffca28; background-color: rgba(255, 202, 40, 0.2); }
+.tab-badge-ts { color: #64b5f6; background-color: rgba(100, 181, 246, 0.2); }
+.tab-badge-py { color: #81c784; background-color: rgba(129, 199, 132, 0.2); }
+.tab-badge-md { color: #f06292; background-color: rgba(240, 98, 146, 0.2); }
+.tab-badge-json { color: #ba68c8; background-color: rgba(186, 104, 200, 0.2); }
+.tab-badge-css { color: #4dd0e1; background-color: rgba(77, 208, 225, 0.2); }
+.tab-badge-html { color: #ff8a65; background-color: rgba(255, 138, 101, 0.2); }
+.tab-badge-txt { color: var(--text-secondary); background-color: rgba(164, 172, 187, 0.2); }
 
 .tab-dirty {
   color: var(--accent);
@@ -276,7 +427,7 @@ body {
   cursor: pointer;
   font-size: 16px;
   padding: 0 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   line-height: 1;
   opacity: 0;
 }
@@ -308,13 +459,14 @@ body {
 .editor-container {
   flex: 1;
   overflow: hidden;
+  background-color: var(--bg-primary);
 }
 
 .terminal-container {
   height: 200px;
   min-height: 100px;
   background-color: var(--bg-primary);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--panel-border);
 }
 
 .terminal-header {
@@ -322,7 +474,7 @@ body {
   align-items: center;
   padding: 6px 12px;
   background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
   font-size: 11px;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -377,7 +529,25 @@ body {
   justify-content: center;
   height: 100%;
   color: var(--text-secondary);
-  gap: 16px;
+  gap: 10px;
+  text-align: center;
+  padding: 12px;
+}
+
+.empty-state-icon {
+  font-size: 28px;
+}
+
+.empty-state-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.empty-state-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 240px;
 }
 
 .empty-state button {
@@ -385,7 +555,7 @@ body {
   background-color: var(--accent);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
@@ -394,7 +564,7 @@ body {
   width: 250px;
   min-width: 150px;
   background-color: var(--bg-secondary);
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--panel-border);
   overflow-y: auto;
 }
 
@@ -414,7 +584,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .git-panel-empty {
@@ -531,11 +701,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 12px;
-  background-color: var(--accent);
+  padding: 6px 12px;
+  background: linear-gradient(120deg, rgba(124, 77, 255, 0.8), rgba(32, 201, 151, 0.8));
   color: white;
   font-size: 12px;
-  height: 22px;
+  height: 28px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3),
                0 0 4px rgba(0, 0, 0, 0.2);
 }
@@ -547,10 +717,25 @@ body {
   gap: 12px;
 }
 
+.status-bar-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
 .status-item {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.status-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .branch-icon {
@@ -560,7 +745,7 @@ body {
 .lsp-mode {
   cursor: pointer;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: background-color 0.15s;
   color: white;
 }
@@ -917,35 +1102,40 @@ body {
   width: 300px;
   min-width: 200px;
   background-color: var(--bg-secondary);
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--panel-border);
   display: flex;
   flex-direction: column;
 }
 
 .right-sidebar-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
+  padding: 6px;
+  gap: 6px;
 }
 
 .right-tab {
   flex: 1;
   padding: 8px 12px;
-  background: none;
-  border: none;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
   color: var(--text-secondary);
   font-size: 11px;
   text-transform: uppercase;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-radius: 999px;
 }
 
 .right-tab:hover {
   color: var(--text-primary);
+  border-color: var(--focus);
 }
 
 .right-tab.active {
   color: var(--text-primary);
-  border-bottom-color: var(--accent);
+  border-color: var(--accent);
+  background-color: rgba(124, 77, 255, 0.12);
+  box-shadow: var(--glow-accent);
 }
 
 /* ========================================

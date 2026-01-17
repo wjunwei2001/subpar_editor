@@ -139,12 +139,20 @@ function App() {
       <Toolbar />
       <div className="main-content">
         <div className="sidebar">
-          <div className="sidebar-header">Explorer</div>
+          <div className="pane-header">
+            <span className="pane-title">
+              <span className="pane-icon">🗂</span>
+              Explorer
+            </span>
+            <span className="pane-subtitle">Workspace</span>
+          </div>
           {currentFolder ? (
             <FileTree />
           ) : (
-            <div className="empty-state" style={{ padding: '20px', textAlign: 'center' }}>
-              <span>No folder opened</span>
+            <div className="empty-state">
+              <span className="empty-state-icon">📂</span>
+              <span className="empty-state-title">No workspace loaded</span>
+              <span className="empty-state-hint">Open a folder to start your next hack.</span>
             </div>
           )}
         </div>
@@ -155,18 +163,33 @@ function App() {
               <MonacoEditor />
             ) : (
               <div className="empty-state">
-                <span>Select a file to start editing</span>
+                <span className="empty-state-icon">🧪</span>
+                <span className="empty-state-title">Pick a file to begin</span>
+                <span className="empty-state-hint">Your next experiment is one click away.</span>
               </div>
             )}
           </div>
           <div className="terminal-container">
-            <div className="terminal-header">Terminal</div>
+            <div className="terminal-header pane-header">
+              <span className="pane-title">
+              <span className="pane-icon">{'>_'}</span>
+                Terminal
+              </span>
+              <span className="pane-subtitle">Session</span>
+            </div>
             <div className="terminal-content">
               <Terminal />
             </div>
           </div>
         </div>
         <div className="right-sidebar">
+          <div className="pane-header">
+            <span className="pane-title">
+              <span className="pane-icon">🧭</span>
+              Control Room
+            </span>
+            <span className="pane-subtitle">Ops</span>
+          </div>
           <div className="right-sidebar-tabs">
             <button
               className={`right-tab ${rightPanelTab === 'git' ? 'active' : ''}`}

@@ -34,6 +34,16 @@ export function LootboxModal() {
     }
   }, [animationPhase, setAnimationPhase]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   const handleBackdropClick = useCallback(() => {
     if (animationPhase === 'idle') {
       closeLootbox();

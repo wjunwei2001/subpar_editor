@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGachaStore } from '../../store/gachaStore';
 import { LootboxCard } from './LootboxCard';
 import { BadgeCollection } from '../BadgeCollection';
@@ -13,6 +13,16 @@ interface ShopModalProps {
 export function ShopModal({ isOpen, onClose }: ShopModalProps) {
   const { inventory, devAddLootboxes, devClearAll, getTotalBadges } = useGachaStore();
   const [showBadges, setShowBadges] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

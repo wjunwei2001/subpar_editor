@@ -1,13 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGitStore } from '../../store/gitStore';
 import { useEditorStore } from '../../store/editorStore';
 import { useGachaStore } from '../../store/gachaStore';
+
+const STATUS_MESSAGES = [
+  'Hack mode: make it weird.',
+  'Quest log: ship something fun.',
+  'Status: gloriously unfinished.',
+  'Lootbox protocol: stand by.',
+  'Subpar plan, excellent execution.',
+];
 
 export function StatusBar() {
   const { currentBranch, isRepo } = useGitStore();
   const { activeFile, lspMode, setPreferencesOpen, autocompleteMode, autocompleteQuota } = useEditorStore();
   const { activeEffects, hasImmunity, getTotalLootboxes } = useGachaStore();
   const [showEffectsTooltip, setShowEffectsTooltip] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(STATUS_MESSAGES[0]);
+
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % STATUS_MESSAGES.length;
+      setStatusMessage(STATUS_MESSAGES[index]);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Format remaining time
   const formatTimeRemaining = (expiresAt: number) => {
@@ -79,7 +98,7 @@ export function StatusBar() {
     <div className="status-bar">
       <div className="status-bar-left">
         {isRepo && currentBranch && (
-          <span className="status-item branch">
+          <span className="status-item status-pill branch">
             <span className="branch-icon">⎇</span>
             {currentBranch}
           </span>
@@ -133,17 +152,20 @@ export function StatusBar() {
           )}
         </div>
       </div>
+      <div className="status-bar-center">
+        <span className="status-pill">{statusMessage}</span>
+      </div>
       <div className="status-bar-right">
         {getTotalLootboxes() > 0 && (
-          <span className="status-item lootbox-indicator">
+          <span className="status-item status-pill lootbox-indicator">
             🎰 {getTotalLootboxes()}
           </span>
         )}
-        <span className={`status-item ${getAutocompleteClass()}`}>
+        <span className={`status-item status-pill ${getAutocompleteClass()}`}>
           {getAutocompleteStatus()}
         </span>
         <span
-          className={`status-item lsp-mode ${lspMode}`}
+          className={`status-item status-pill lsp-mode ${lspMode}`}
           onClick={() => setPreferencesOpen(true)}
           title="Click to change LSP mode"
         >
@@ -151,8 +173,8 @@ export function StatusBar() {
         </span>
         {activeFile && (
           <>
-            <span className="status-item">{getLanguage(activeFile)}</span>
-            <span className="status-item">UTF-8</span>
+            <span className="status-item status-pill">{getLanguage(activeFile)}</span>
+            <span className="status-item status-pill">UTF-8</span>
           </>
         )}
       </div>

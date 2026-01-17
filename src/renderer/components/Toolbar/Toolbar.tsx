@@ -49,39 +49,48 @@ export function Toolbar() {
 
   return (
     <div className="toolbar">
-      <button onClick={handleOpenFolder}>
-        <span>📁</span>
-        Open Folder
-      </button>
-      <button
-        onClick={handleSave}
-        disabled={!activeFile || !isDirty}
-        style={{ opacity: activeFile && isDirty ? 1 : 0.5 }}
-        title="Save (Ctrl+S)"
-      >
-        <span>💾</span>
-        Save
-      </button>
-      <button
-        className="run-button"
-        onClick={handleRun}
-        disabled={!canRun}
-        style={{ opacity: canRun ? 1 : 0.5 }}
-      >
-        <span>▶</span>
-        Run
-      </button>
-      {fileName && (
-        <span className="current-file">
-          {fileName}{isDirty ? ' •' : ''}
-        </span>
-      )}
-      <div className="toolbar-gacha-buttons">
-        <button className="shop-btn" onClick={() => setShopOpen(true)}>
+      <div className="toolbar-brand">
+        <span className="brand-title">Subpar</span>
+        <span className="brand-subtitle">Editor</span>
+      </div>
+      <div className="toolbar-group">
+        <button className="toolbar-button" onClick={handleOpenFolder}>
+          <span>📁</span>
+          Open Folder
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={handleSave}
+          disabled={!activeFile || !isDirty}
+          style={{ opacity: activeFile && isDirty ? 1 : 0.5 }}
+          title="Save (Ctrl+S)"
+        >
+          <span>💾</span>
+          Save
+        </button>
+      </div>
+      <div className="toolbar-group">
+        <button
+          className="toolbar-button run-button"
+          onClick={handleRun}
+          disabled={!canRun}
+          style={{ opacity: canRun ? 1 : 0.5 }}
+        >
+          <span>▶</span>
+          Run
+        </button>
+        {fileName && (
+          <span className="toolbar-pill current-file">
+            {fileName}{isDirty ? ' •' : ''}
+          </span>
+        )}
+      </div>
+      <div className="toolbar-group toolbar-gacha-buttons">
+        <button className="toolbar-button shop-btn" onClick={() => setShopOpen(true)}>
           <span>🛒</span>
           Shop
         </button>
-        <button className="gacha-btn" onClick={openLootbox}>
+        <button className="toolbar-button gacha-btn" onClick={openLootbox}>
           <span>🎰</span>
           Gacha
           {getTotalLootboxes() > 0 && (
@@ -91,12 +100,12 @@ export function Toolbar() {
       </div>
       <div className="toolbar-spacer" />
       {currentFolder && (
-        <span className="current-folder">{currentFolder}</span>
+        <span className="toolbar-pill current-folder">{currentFolder}</span>
       )}
       <button
         onClick={() => setPreferencesOpen(true)}
         title="Preferences"
-        className="settings-button"
+        className="toolbar-button settings-button"
       >
         <span>⚙️</span>
       </button>

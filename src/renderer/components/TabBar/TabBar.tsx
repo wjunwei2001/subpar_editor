@@ -12,6 +12,31 @@ export function TabBar() {
 
   const getFileName = (path: string) => path.split(/[\\/]/).pop() || path;
 
+  const getFileExtension = (path: string) => path.split('.').pop()?.toLowerCase() || '';
+
+  const getBadgeInfo = (ext: string) => {
+    switch (ext) {
+      case 'js':
+      case 'jsx':
+        return { label: 'JS', className: 'js' };
+      case 'ts':
+      case 'tsx':
+        return { label: 'TS', className: 'ts' };
+      case 'py':
+        return { label: 'PY', className: 'py' };
+      case 'md':
+        return { label: 'MD', className: 'md' };
+      case 'json':
+        return { label: 'JSON', className: 'json' };
+      case 'css':
+        return { label: 'CSS', className: 'css' };
+      case 'html':
+        return { label: 'HTML', className: 'html' };
+      default:
+        return { label: 'TXT', className: 'txt' };
+    }
+  };
+
   const handleClose = (e: React.MouseEvent, path: string) => {
     e.stopPropagation();
     const file = openFiles.find((f) => f.path === path);
@@ -57,8 +82,10 @@ export function TabBar() {
 
   return (
     <div className="tab-bar">
-      {openFiles.map((file, index) => (
-        <div
+      {openFiles.map((file, index) => {
+        const badge = getBadgeInfo(getFileExtension(file.path));
+        return (
+          <div
           key={file.path}
           draggable={true}
           className={`tab ${file.path === activeFile ? 'active' : ''} ${
@@ -74,6 +101,7 @@ export function TabBar() {
         >
           <span className="tab-name">
             {file.isDirty && <span className="tab-dirty">●</span>}
+            <span className={`tab-badge tab-badge-${badge.className}`}>{badge.label}</span>
             {getFileName(file.path)}
           </span>
           <button
@@ -83,8 +111,9 @@ export function TabBar() {
           >
             ×
           </button>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
