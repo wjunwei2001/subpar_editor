@@ -1481,6 +1481,30 @@ body {
   transform: scale(1.05);
 }
 
+.ad-buy-button.success {
+  animation: adPurchaseSuccess 0.3s ease-out;
+}
+
+.ad-buy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+@keyframes adPurchaseSuccess {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(107, 203, 119, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(107, 203, 119, 0.9);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(107, 203, 119, 0);
+  }
+}
+
 .ad-footer {
   text-align: center;
   padding: 12px;

@@ -17,6 +17,7 @@ const FAKE_DEALS = [
 export function AdPanel() {
   const [countdown, setCountdown] = useState(599); // 9:59
   const [currentAd, setCurrentAd] = useState(0);
+  const [purchasingIndex, setPurchasingIndex] = useState<number | null>(null);
 
   // Countdown timer
   useEffect(() => {
@@ -38,6 +39,16 @@ export function AdPanel() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handlePurchase = (index: number) => {
+    if (purchasingIndex !== null) return;
+
+    // Trigger success animation
+    setPurchasingIndex(index);
+    setTimeout(() => {
+      setPurchasingIndex(null);
+    }, 600);
   };
 
   return (
@@ -62,7 +73,13 @@ export function AdPanel() {
               <span className="ad-price-original">${deal.originalPrice}</span>
               <span className="ad-price-sale">${deal.salePrice}</span>
             </div>
-            <button className="ad-buy-button">BUY NOW!</button>
+            <button
+              className={`ad-buy-button ${purchasingIndex === index ? 'success' : ''}`}
+              onClick={() => handlePurchase(index)}
+              disabled={purchasingIndex === index}
+            >
+              {purchasingIndex === index ? '✓ Purchased!' : 'BUY NOW!'}
+            </button>
           </div>
         ))}
       </div>

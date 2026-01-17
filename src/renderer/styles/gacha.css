@@ -375,7 +375,10 @@
   display: flex;
   gap: 24px;
   justify-content: center;
+  align-items: flex-start;
   margin-bottom: 32px;
+  flex-wrap: wrap;
+  padding: 0 20px;
 }
 
 .lootbox-card {
@@ -387,6 +390,10 @@
   text-align: center;
   position: relative;
   transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .lootbox-card:hover {
@@ -433,12 +440,16 @@
 .card-emoji {
   font-size: 64px;
   margin-bottom: 12px;
+  text-align: center;
+  width: 100%;
 }
 
 .card-title {
   margin: 0 0 8px 0;
   font-size: 18px;
   color: #fff;
+  text-align: center;
+  width: 100%;
 }
 
 .card-price {
@@ -446,12 +457,21 @@
   font-weight: bold;
   color: #4caf50;
   margin-bottom: 12px;
+  text-align: center;
+  width: 100%;
 }
 
 .card-description {
   color: #888;
   font-size: 14px;
   margin: 0 0 16px 0;
+  text-align: center;
+  width: 100%;
+  line-height: 1.4;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-drops {
@@ -459,6 +479,14 @@
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 16px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .drops-label {
@@ -466,12 +494,17 @@
   color: #666;
   font-size: 11px;
   margin-bottom: 4px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .drops-rates {
   color: #aaa;
   font-size: 10px;
   line-height: 1.4;
+  display: block;
+  text-align: center;
 }
 
 .purchase-button {
@@ -485,11 +518,37 @@
   cursor: pointer;
   width: 100%;
   transition: all 0.2s;
+  margin-top: auto;
+  box-sizing: border-box;
 }
 
 .purchase-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+}
+
+.purchase-button.success {
+  animation: purchaseSuccess 0.3s ease-out;
+}
+
+.purchase-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+@keyframes purchaseSuccess {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+  }
 }
 
 /* Dev Mode Section */

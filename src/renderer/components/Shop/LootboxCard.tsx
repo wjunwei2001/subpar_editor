@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGachaStore } from '../../store/gachaStore';
 import type { LootboxType } from '@shared/gachaTypes';
 
@@ -19,6 +20,7 @@ export function LootboxCard({
   badge,
 }: LootboxCardProps) {
   const { addLootbox, priceMultiplier } = useGachaStore();
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const displayPrice =
     priceMultiplier > 1
@@ -37,9 +39,17 @@ export function LootboxCard({
   };
 
   const handlePurchase = () => {
+    if (isPurchasing) return;
+
     // In dev mode, just add the lootbox directly
     // Stripe integration will replace this
     addLootbox(type);
+
+    // Trigger success animation
+    setIsPurchasing(true);
+    setTimeout(() => {
+      setIsPurchasing(false);
+    }, 600);
   };
 
   return (
@@ -59,8 +69,12 @@ export function LootboxCard({
         <span className="drops-rates">{dropRates}</span>
       </div>
 
-      <button className="purchase-button" onClick={handlePurchase}>
-        Buy Now
+      <button
+        className={`purchase-button ${isPurchasing ? 'success' : ''}`}
+        onClick={handlePurchase}
+        disabled={isPurchasing}
+      >
+        {isPurchasing ? '✓ Purchased!' : 'Buy Now'}
       </button>
     </div>
   );
