@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
 import { useGachaStore } from '../../store/gachaStore';
+<<<<<<< HEAD
 import { ShopModal } from '../Shop/ShopModal';
 import { GachaModal } from '../Gacha/GachaModal';
+=======
+>>>>>>> 3f0247e14b51895efb3b6645366e3f089d47786a
 
 export function Toolbar() {
   const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
