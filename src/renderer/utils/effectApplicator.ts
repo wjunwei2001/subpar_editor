@@ -153,8 +153,14 @@ function applySpecialEffect(
 }
 
 // Apply a badge effect
-function applyBadgeEffect(effect: BadgeEffect, addBadge: (badge: any) => void): void {
+function applyBadgeEffect(
+  effect: BadgeEffect,
+  addBadge: (badge: any) => void,
+  setCursorBadge: (badge: any) => void
+): void {
   addBadge(effect.badge);
+  // Auto-set the most recent badge as cursor
+  setCursorBadge(effect.badge);
 }
 
 // Apply a curse effect
@@ -272,6 +278,10 @@ export function applyEffect(
     }));
   };
 
+  const setCursorBadge = (badge: any) => {
+    setState({ cursorBadge: badge });
+  };
+
   const setImmunity = (durationMs: number) => {
     setState({
       hasImmunity: true,
@@ -321,7 +331,7 @@ export function applyEffect(
       applySpecialEffect(effect as SpecialEffect, pull.id, addActiveEffect, setImmunity);
       break;
     case 'badge':
-      applyBadgeEffect(effect as BadgeEffect, addBadge);
+      applyBadgeEffect(effect as BadgeEffect, addBadge, setCursorBadge);
       break;
     case 'curse':
       applyCurseEffect(effect as CurseEffect, pull.id, addActiveEffect);

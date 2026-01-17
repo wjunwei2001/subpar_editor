@@ -30,6 +30,9 @@ interface GachaState {
   // Badge collection
   badges: BadgeCollection;
 
+  // Cursor badge (most recent badge becomes cursor)
+  cursorBadge: SponsorBadge | null;
+
   // Active effects (timer-based)
   activeEffects: ActiveEffect[];
 
@@ -63,6 +66,7 @@ interface GachaState {
   // Badge management
   addBadge: (badge: SponsorBadge) => void;
   getTotalBadges: () => number;
+  setCursorBadge: (badge: SponsorBadge | null) => void;
 
   // Meta curse actions
   applyPriceMultiplier: (multiplier: number, pulls: number) => void;
@@ -101,6 +105,8 @@ export const useGachaStore = create<GachaState>()(
         citadel: 0,
         optiver: 0,
       },
+
+      cursorBadge: null,
 
       activeEffects: [],
 
@@ -311,6 +317,8 @@ export const useGachaStore = create<GachaState>()(
         return Object.values(badges).reduce((sum, count) => sum + count, 0);
       },
 
+      setCursorBadge: (badge) => set({ cursorBadge: badge }),
+
       applyPriceMultiplier: (multiplier, pulls) =>
         set({
           priceMultiplier: multiplier,
@@ -373,6 +381,7 @@ export const useGachaStore = create<GachaState>()(
             citadel: 0,
             optiver: 0,
           },
+          cursorBadge: null,
           activeEffects: [],
           priceMultiplier: 1,
           priceMultiplierPullsRemaining: 0,
@@ -387,6 +396,7 @@ export const useGachaStore = create<GachaState>()(
         inventory: state.inventory,
         pullHistory: state.pullHistory,
         badges: state.badges,
+        cursorBadge: state.cursorBadge,
         activeEffects: state.activeEffects,
         priceMultiplier: state.priceMultiplier,
         priceMultiplierPullsRemaining: state.priceMultiplierPullsRemaining,

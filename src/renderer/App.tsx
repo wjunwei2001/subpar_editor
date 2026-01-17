@@ -13,13 +13,14 @@ import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 import { useGachaStore } from './store/gachaStore';
 import { useAgentStore } from './store/agentStore';
+import { getBadgeLogoUrl } from '@shared/gachaConfig';
 
 type RightPanelTab = 'git' | 'agent';
 
 function App() {
   const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference } = useEditorStore();
   const { refreshStatus } = useGitStore();
-  const { checkTimers: checkGachaTimers } = useGachaStore();
+  const { checkTimers: checkGachaTimers, cursorBadge } = useGachaStore();
   const { checkTimers: checkAgentTimers } = useAgentStore();
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('git');
 
@@ -55,6 +56,46 @@ function App() {
       root.classList.add(themePreference === 'light' ? 'theme-light' : 'theme-dark');
     }
   }, [colorMode, themePreference]);
+
+  // Apply custom cursor based on badge
+  useEffect(() => {
+    if (cursorBadge) {
+      const logoUrl = getBadgeLogoUrl(cursorBadge);
+
+      // Create a small cursor image (32x32) from the badge logo
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const size = 32;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Draw white background circle
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw the logo scaled down
+          const padding = 4;
+          ctx.drawImage(img, padding, padding, size - padding * 2, size - padding * 2);
+
+          // Convert to cursor
+          const cursorUrl = canvas.toDataURL('image/png');
+          document.body.style.cursor = `url('${cursorUrl}') 16 16, auto`;
+        }
+      };
+      img.src = logoUrl;
+    } else {
+      document.body.style.cursor = '';
+    }
+
+    return () => {
+      document.body.style.cursor = '';
+    };
+  }, [cursorBadge]);
 
   // Refresh git status when folder changes
   useEffect(() => {

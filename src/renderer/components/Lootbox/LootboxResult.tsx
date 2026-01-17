@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import type { GachaPull, GachaEffect, EffectCategory } from '@shared/gachaTypes';
-import { RARITY_COLORS } from '@shared/gachaConfig';
+import type { GachaPull, GachaEffect, EffectCategory, BadgeEffect } from '@shared/gachaTypes';
+import { RARITY_COLORS, getBadgeLogoUrl, BADGE_DISPLAY_NAMES } from '@shared/gachaConfig';
 import { LootboxModel } from './LootboxModel';
 
 interface LootboxResultProps {
@@ -23,6 +23,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
   const isNeutral = pull.category === 'neutral';
   const isNegative = pull.category === 'negative';
   const isLegendary = pull.rarity === 'legendary';
+  const isBadge = pull.effect.type === 'badge';
 
   // Generate floating sparkles
   const sparkles = useMemo<Sparkle[]>(() => {
@@ -36,12 +37,27 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
     }));
   }, [pull.rarity, isLegendary]);
 
-  // Get icon based on effect
-  const getIcon = () => {
+  // Get icon based on effect - returns either emoji string or JSX for badge logo
+  const getIcon = (): React.ReactNode => {
     const effect = pull.effect;
 
     if (effect.type === 'badge') {
-      return '🏷️';
+      const badgeEffect = effect as BadgeEffect;
+      const logoUrl = getBadgeLogoUrl(badgeEffect.badge);
+      return (
+        <img
+          src={logoUrl}
+          alt={BADGE_DISPLAY_NAMES[badgeEffect.badge]}
+          style={{
+            width: '64px',
+            height: '64px',
+            objectFit: 'contain',
+            borderRadius: '8px',
+            background: '#fff',
+            padding: '4px',
+          }}
+        />
+      );
     }
 
     if (effect.type === 'timer' || effect.type === 'quota') {
@@ -149,12 +165,12 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
   };
 
   // Get category emoji
-  const getCategoryEmoji = (): string => {
+  const getCategoryIcon = (): string => {
     switch (pull.category) {
       case 'positive':
         return '✨';
       case 'neutral':
-        return '🏷️';
+        return '🏆';
       case 'negative':
         return '💀';
     }
@@ -198,8 +214,8 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
       {/* Glow behind result */}
       <div className="result-glow" />
 
-      {/* 3D Model */}
-      <LootboxModel category={pull.category} />
+      {/* 3D Model - gold for badges/epic/legendary, silver for others */}
+      <LootboxModel category={pull.category} isBadge={isBadge} rarity={pull.rarity} />
 
       {/* Icon */}
       <motion.div
@@ -256,7 +272,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.45 }}
       >
-        {getCategoryEmoji()} {getCategoryLabel()}
+        {getCategoryIcon()} {getCategoryLabel()}
       </motion.div>
 
       {/* Claim button */}

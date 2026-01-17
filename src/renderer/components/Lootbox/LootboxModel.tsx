@@ -1,9 +1,11 @@
 import React, { Suspense, useState, useEffect, Component } from 'react';
 import { motion } from 'framer-motion';
-import type { EffectCategory } from '@shared/gachaTypes';
+import type { EffectCategory, Rarity } from '@shared/gachaTypes';
 
 interface LootboxModelProps {
   category: EffectCategory;
+  isBadge?: boolean;
+  rarity?: Rarity;
 }
 
 // Model colors based on category
@@ -18,8 +20,8 @@ function LoadingPlaceholder() {
   return (
     <div
       style={{
-        width: '200px',
-        height: '200px',
+        width: '280px',
+        height: '280px',
         margin: '0 auto 16px auto',
         display: 'flex',
         alignItems: 'center',
@@ -48,13 +50,13 @@ function FallbackDisplay({ category }: { category: EffectCategory }) {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       style={{
-        width: '200px',
-        height: '200px',
+        width: '280px',
+        height: '280px',
         margin: '0 auto 16px auto',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '80px',
+        fontSize: '100px',
         filter: `drop-shadow(0 0 20px ${color})`,
       }}
     >
@@ -89,9 +91,23 @@ class ErrorBoundary extends Component<
 // Lazy-loaded 3D scene
 const Lootbox3DScene = React.lazy(() => import('./Lootbox3DScene'));
 
-export function LootboxModel({ category }: LootboxModelProps) {
+export function LootboxModel({ category, isBadge, rarity }: LootboxModelProps) {
   const [canRender3D, setCanRender3D] = useState(false);
   const [checkComplete, setCheckComplete] = useState(false);
+
+  // Determine model based on category and rarity
+  // - Negative/Curse: bad model (red)
+  // - Badges: good model (gold)
+  // - Epic/Legendary rarity: good model (gold)
+  // - Common/Uncommon/Rare: neutral model (silver)
+  const getEffectiveCategory = (): EffectCategory => {
+    if (category === 'negative') return 'negative';
+    if (isBadge) return 'positive';
+    if (rarity === 'epic' || rarity === 'legendary') return 'positive';
+    return 'neutral';
+  };
+
+  const effectiveCategory = getEffectiveCategory();
 
   useEffect(() => {
     // Check WebGL support
@@ -118,7 +134,7 @@ export function LootboxModel({ category }: LootboxModelProps) {
 
   // WebGL not available, show fallback
   if (!canRender3D) {
-    return <FallbackDisplay category={category} />;
+    return <FallbackDisplay category={effectiveCategory} />;
   }
 
   return (
@@ -129,14 +145,14 @@ export function LootboxModel({ category }: LootboxModelProps) {
       exit={{ opacity: 0, scale: 0.5 }}
       transition={{ duration: 0.5, type: 'spring' }}
       style={{
-        width: '200px',
-        height: '200px',
+        width: '280px',
+        height: '280px',
         margin: '0 auto 16px auto',
       }}
     >
-      <ErrorBoundary fallback={<FallbackDisplay category={category} />}>
+      <ErrorBoundary fallback={<FallbackDisplay category={effectiveCategory} />}>
         <Suspense fallback={<LoadingPlaceholder />}>
-          <Lootbox3DScene category={category} />
+          <Lootbox3DScene category={effectiveCategory} />
         </Suspense>
       </ErrorBoundary>
       <style>{`

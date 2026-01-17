@@ -41,11 +41,36 @@
 
 .badge-card.collected {
   border-color: #4caf50;
+  cursor: pointer;
 }
 
 .badge-card.collected:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+}
+
+.badge-card.equipped {
+  border-color: #ff9800;
+  box-shadow: 0 0 16px rgba(255, 152, 0, 0.4);
+}
+
+.badge-card.equipped:hover {
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.3);
+}
+
+.badge-equipped-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 1;
 }
 
 .badge-card.locked {

@@ -59,7 +59,7 @@ function Model({ category }: { category: EffectCategory }) {
     const maxDim = Math.max(size.x, size.y, size.z);
 
     if (maxDim > 0) {
-      // Slightly smaller scale
+      // Scale to fit nicely in the container
       const scale = 2.5 / maxDim;
       clone.scale.setScalar(scale);
     }

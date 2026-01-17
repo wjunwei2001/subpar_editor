@@ -16,14 +16,27 @@ const ALL_BADGES: SponsorBadge[] = [
 interface BadgeCardProps {
   badge: SponsorBadge;
   count: number;
+  isEquipped: boolean;
+  onEquip: (badge: SponsorBadge) => void;
 }
 
-function BadgeCard({ badge, count }: BadgeCardProps) {
+function BadgeCard({ badge, count, isEquipped, onEquip }: BadgeCardProps) {
   const isCollected = count > 0;
   const logoUrl = getBadgeLogoUrl(badge);
 
+  const handleClick = () => {
+    if (isCollected) {
+      onEquip(badge);
+    }
+  };
+
   return (
-    <div className={`badge-card ${isCollected ? 'collected' : 'locked'}`}>
+    <div
+      className={`badge-card ${isCollected ? 'collected' : 'locked'} ${isEquipped ? 'equipped' : ''}`}
+      onClick={handleClick}
+      title={isCollected ? (isEquipped ? 'Currently equipped as cursor' : 'Click to equip as cursor') : 'Locked'}
+    >
+      {isEquipped && <div className="badge-equipped-indicator">CURSOR</div>}
       <div className="badge-logo-container">
         {isCollected ? (
           <img
@@ -59,8 +72,17 @@ function BadgeCard({ badge, count }: BadgeCardProps) {
 }
 
 export function BadgeCollection() {
-  const { badges, getTotalBadges } = useGachaStore();
+  const { badges, getTotalBadges, cursorBadge, setCursorBadge } = useGachaStore();
   const totalCollected = ALL_BADGES.filter((b) => badges[b] > 0).length;
+
+  const handleEquip = (badge: SponsorBadge) => {
+    // Toggle off if clicking the same badge, otherwise equip
+    if (cursorBadge === badge) {
+      setCursorBadge(null);
+    } else {
+      setCursorBadge(badge);
+    }
+  };
 
   return (
     <div className="badge-collection">
@@ -73,7 +95,13 @@ export function BadgeCollection() {
 
       <div className="badge-grid">
         {ALL_BADGES.map((badge) => (
-          <BadgeCard key={badge} badge={badge} count={badges[badge]} />
+          <BadgeCard
+            key={badge}
+            badge={badge}
+            count={badges[badge]}
+            isEquipped={cursorBadge === badge}
+            onEquip={handleEquip}
+          />
         ))}
       </div>
 
