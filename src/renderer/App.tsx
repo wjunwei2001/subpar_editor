@@ -64,9 +64,34 @@ function App() {
       const interval = setInterval(() => {
         refreshStatus(currentFolder);
       }, 5000);
-      return () => clearInterval(interval);
+
+      // Start file watcher
+      window.electronAPI.watcher?.start?.(currentFolder);
+
+      return () => {
+        clearInterval(interval);
+        window.electronAPI.watcher?.stop?.();
+      };
+    } else {
+      // Stop watcher when folder closes
+      window.electronAPI.watcher?.stop?.();
     }
   }, [currentFolder, refreshStatus]);
+
+  // Listen for external file changes
+  useEffect(() => {
+    const handleFileChanged = (_event: any, data: { path: string; content: string }) => {
+      const { handleFileChanged } = useEditorStore.getState();
+      handleFileChanged(data.path, data.content);
+    };
+
+    window.electronAPI.onFileChanged?.(handleFileChanged);
+
+    return () => {
+      // Clean up listener - ipcRenderer.removeListener doesn't exist in exposed API
+      // Just let it be cleaned up when component unmounts
+    };
+  }, []);
 
   return (
     <div className="app-container">

@@ -64,4 +64,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     chat: (request: AgentChatRequest) => ipcRenderer.invoke('agent:chat', request),
     cancel: (requestId: string) => ipcRenderer.invoke('agent:cancel', requestId),
   },
+  watcher: {
+    start: (folderPath: string) => ipcRenderer.invoke('watcher:start', folderPath),
+    stop: () => ipcRenderer.invoke('watcher:stop'),
+  },
+  onFileChanged: (callback: (event: Electron.IpcRendererEvent, data: { path: string; content: string }) => void) => {
+    ipcRenderer.on('file:changed', callback);
+  },
 });

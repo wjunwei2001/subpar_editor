@@ -138,6 +138,11 @@ export interface IElectronAPI {
     chat: (request: AgentChatRequest) => Promise<AgentChatResponse | null>;
     cancel: (requestId: string) => Promise<boolean>;
   };
+  watcher: {
+    start: (folderPath: string) => Promise<{ success: boolean }>;
+    stop: () => Promise<{ success: boolean }>;
+  };
+  onFileChanged: (callback: (event: Electron.IpcRendererEvent, data: { path: string; content: string }) => void) => void;
 }
 
 declare global {

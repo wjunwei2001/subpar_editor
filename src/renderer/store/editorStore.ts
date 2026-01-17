@@ -63,6 +63,8 @@ interface EditorState {
   reloadFile: (path: string) => Promise<void>;
   refreshFileTree: () => Promise<void>;
   setTerminalId: (id: number | null) => void;
+  reorderFiles: (fromIndex: number, toIndex: number) => void;
+  handleFileChanged: (path: string, content: string) => Promise<void>;
   setLspMode: (mode: LspMode) => void;
   setPreferencesOpen: (open: boolean) => void;
   setAutocompleteMode: (mode: AutocompleteMode) => void;
@@ -190,6 +192,54 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const entries = await window.electronAPI.fs.readDir(currentFolder);
       set({ fileTree: entries });
     }
+  },
+
+  reorderFiles: (fromIndex, toIndex) => set((state) => {
+    const newOpenFiles = [...state.openFiles];
+    const [removed] = newOpenFiles.splice(fromIndex, 1);
+    newOpenFiles.splice(toIndex, 0, removed);
+
+    // Update activeFile index if needed
+    if (state.activeFile) {
+      const activeIndex = state.openFiles.findIndex(f => f.path === state.activeFile);
+      if (activeIndex === fromIndex) {
+        // Active file was moved
+        return { openFiles: newOpenFiles, activeFile: removed.path };
+      } else if (activeIndex > fromIndex && activeIndex <= toIndex) {
+        // Active file shifted left
+        const activeFile = newOpenFiles[activeIndex - 1].path;
+        return { openFiles: newOpenFiles, activeFile };
+      } else if (activeIndex >= toIndex && activeIndex < fromIndex) {
+        // Active file shifted right
+        const activeFile = newOpenFiles[activeIndex + 1].path;
+        return { openFiles: newOpenFiles, activeFile };
+      }
+    }
+
+    return { openFiles: newOpenFiles };
+  }),
+
+  handleFileChanged: async (path, content) => {
+    const state = get();
+    const file = state.openFiles.find((f) => f.path === path);
+
+    if (!file) {
+      return; // File not open, ignore
+    }
+
+    if (file.isDirty) {
+      // File has unsaved changes - show warning but don't reload
+      console.warn(`File ${path} changed externally but has unsaved changes`);
+      // Could show a toast notification here
+      return;
+    }
+
+    // Auto-reload if clean
+    const newOpenFiles = state.openFiles.map((f) =>
+      f.path === path ? { ...f, content } : f
+    );
+
+    set({ openFiles: newOpenFiles });
   },
 
   setTerminalId: (id) => set({ terminalId: id }),

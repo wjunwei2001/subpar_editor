@@ -291,6 +291,20 @@ body {
   color: var(--text-primary);
 }
 
+.tab.dragging {
+  opacity: 0.5;
+  background-color: var(--bg-secondary);
+}
+
+.tab.drag-over {
+  border-left: 2px solid var(--accent);
+  background-color: var(--hover);
+}
+
+.tab.drag-over .tab-close {
+  opacity: 1;
+}
+
 .editor-container {
   flex: 1;
   overflow: hidden;
