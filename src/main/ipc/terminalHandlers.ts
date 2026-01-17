@@ -9,7 +9,9 @@ let terminalIdCounter = 0;
 export function registerTerminalHandlers() {
   ipcMain.handle('terminal:create', async (event): Promise<number> => {
     const id = ++terminalIdCounter;
-    const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
+    const shell = process.platform === 'win32'
+      ? 'powershell.exe'
+      : process.env.SHELL || '/bin/zsh';
 
     const ptyProcess = pty.spawn(shell, [], {
       name: 'xterm-256color',

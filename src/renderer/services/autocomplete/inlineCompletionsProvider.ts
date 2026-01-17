@@ -5,8 +5,6 @@ import { AutocompleteRequest, END_TOKEN } from './types';
 const DEBOUNCE_DELAY = 400;
 
 // Context limits for LLM token efficiency
-// ~4 chars per token, so 4000 chars ≈ 1000 tokens for prefix
-// Suffix is less important, so we keep it smaller
 const MAX_PREFIX_CHARS = 4000;
 const MAX_SUFFIX_CHARS = 1000;
 
@@ -20,8 +18,6 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
     _context: monaco.languages.InlineCompletionContext,
     token: monaco.CancellationToken
   ): Promise<monaco.languages.InlineCompletions | null> {
-    console.log('[Autocomplete] provideInlineCompletions called at', position.lineNumber, position.column);
-
     // Cancel any pending debounced request
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -36,18 +32,14 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
 
     // Don't provide completions if cancelled immediately
     if (token.isCancellationRequested) {
-      console.log('[Autocomplete] Cancelled immediately');
       return null;
     }
 
     // Wait for debounce
     const cancelled = await this.debounce(DEBOUNCE_DELAY, token);
     if (cancelled || token.isCancellationRequested) {
-      console.log('[Autocomplete] Cancelled during debounce');
       return null;
     }
-
-    console.log('[Autocomplete] Debounce passed, fetching suggestion...');
 
     // Get text before and after cursor
     const textBeforeCursor = model.getValueInRange({
@@ -65,7 +57,6 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
     });
 
     // Truncate context to avoid exceeding LLM token limits
-    // Keep the most recent prefix (closest to cursor) and nearest suffix
     const truncatedPrefix = textBeforeCursor.length > MAX_PREFIX_CHARS
       ? textBeforeCursor.slice(-MAX_PREFIX_CHARS)
       : textBeforeCursor;
@@ -86,10 +77,8 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
 
     try {
       const response = await autocompleteService.getSuggestion(request);
-      console.log('[Autocomplete] Got response:', response);
 
       if (!response || token.isCancellationRequested) {
-        console.log('[Autocomplete] No response or cancelled');
         return null;
       }
 
@@ -97,14 +86,12 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
 
       // Parse the suggestion, stripping the end token
       const insertText = this.parseCompletion(response.suggestion);
-      console.log('[Autocomplete] Parsed insertText:', insertText);
 
       if (!insertText) {
-        console.log('[Autocomplete] Empty insertText');
         return null;
       }
 
-      const result = {
+      return {
         items: [
           {
             insertText: insertText,
@@ -117,8 +104,6 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
           },
         ],
       };
-      console.log('[Autocomplete] Returning result:', result);
-      return result;
     } catch (error) {
       console.error('[Autocomplete] Error:', error);
       return null;

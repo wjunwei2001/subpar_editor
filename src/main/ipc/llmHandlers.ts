@@ -2,12 +2,10 @@ import { ipcMain } from 'electron';
 
 const END_TOKEN = '<|endoftext|>';
 
-// Lorem ipsum words for dummy responses
-const LOREM_WORDS = [
-  'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
-  'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor',
-  'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua',
-];
+// Groq API configuration
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// Fast models: 'llama-3.1-8b-instant' (fastest), 'llama-3.3-70b-versatile' (better quality)
+const GROQ_MODEL = 'llama-3.1-8b-instant';
 
 // Track pending requests for cancellation
 const pendingRequests = new Map<string, AbortController>();
@@ -25,95 +23,132 @@ interface LLMCompletionResponse {
 }
 
 /**
- * DUMMY LLM FUNCTION - Replace this with your actual LLM API call
- *
- * Example for OpenAI:
- * ```typescript
- * async function callLLM(request: LLMCompletionRequest, signal: AbortSignal): Promise<LLMCompletionResponse> {
- *   const response = await fetch('https://api.openai.com/v1/completions', {
- *     method: 'POST',
- *     headers: {
- *       'Content-Type': 'application/json',
- *       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
- *     },
- *     body: JSON.stringify({
- *       model: 'gpt-3.5-turbo-instruct',
- *       prompt: request.prefix,
- *       suffix: request.suffix,
- *       max_tokens: 150,
- *       stop: ['\n\n', END_TOKEN],
- *     }),
- *     signal,
- *   });
- *   const data = await response.json();
- *   return {
- *     text: data.choices[0].text + END_TOKEN,
- *     finishReason: 'stop',
- *   };
- * }
- * ```
- *
- * Example for Anthropic Claude:
- * ```typescript
- * async function callLLM(request: LLMCompletionRequest, signal: AbortSignal): Promise<LLMCompletionResponse> {
- *   const response = await fetch('https://api.anthropic.com/v1/messages', {
- *     method: 'POST',
- *     headers: {
- *       'Content-Type': 'application/json',
- *       'x-api-key': process.env.ANTHROPIC_API_KEY,
- *       'anthropic-version': '2023-06-01',
- *     },
- *     body: JSON.stringify({
- *       model: 'claude-3-haiku-20240307',
- *       max_tokens: 150,
- *       messages: [{
- *         role: 'user',
- *         content: `Complete this code:\n\n${request.prefix}[CURSOR]${request.suffix}\n\nProvide only the completion text, nothing else.`
- *       }],
- *     }),
- *     signal,
- *   });
- *   const data = await response.json();
- *   return {
- *     text: data.content[0].text + END_TOKEN,
- *     finishReason: 'stop',
- *   };
- * }
- * ```
+ * Get the Groq API key from environment variables
+ */
+function getApiKey(): string | null {
+  return process.env.GROQ_API_KEY || null;
+}
+
+/**
+ * Build a prompt for code completion
+ */
+function buildPrompt(request: LLMCompletionRequest): string {
+  const { prefix, suffix, language } = request;
+
+  // Get the last few lines of prefix for context (more focused)
+  const prefixLines = prefix.split('\n');
+  const contextLines = prefixLines.slice(-30).join('\n'); // Last 30 lines
+
+  // Get first few lines of suffix
+  const suffixLines = suffix.split('\n');
+  const suffixContext = suffixLines.slice(0, 10).join('\n'); // First 10 lines
+
+  return `You are a code completion assistant. Complete the code at the cursor position marked with <CURSOR>.
+
+Language: ${language}
+
+Code before cursor:
+\`\`\`${language}
+${contextLines}<CURSOR>
+\`\`\`
+
+Code after cursor:
+\`\`\`${language}
+${suffixContext}
+\`\`\`
+
+Instructions:
+- Output ONLY the code that should be inserted at the cursor position
+- Do not repeat any code that already exists
+- Do not include explanations, markdown, or code fences
+- Keep the completion concise (1-3 lines typically)
+- Match the existing code style and indentation
+- End your response with ${END_TOKEN}
+
+Completion:`;
+}
+
+/**
+ * Call Groq API for code completion
  */
 async function callLLM(
   request: LLMCompletionRequest,
   signal: AbortSignal
 ): Promise<LLMCompletionResponse> {
-  // Simulate API latency (200-500ms for realistic LLM timing)
-  const delay = Math.floor(Math.random() * 300) + 200;
+  const apiKey = getApiKey();
 
-  await new Promise<void>((resolve, reject) => {
-    const timeout = setTimeout(resolve, delay);
-    signal.addEventListener('abort', () => {
-      clearTimeout(timeout);
-      reject(new Error('Aborted'));
+  // Fallback to dummy response if no API key
+  if (!apiKey) {
+    console.warn('[LLM] No GROQ_API_KEY found. Set it in your environment variables.');
+    console.warn('[LLM] Example: export GROQ_API_KEY=your_api_key_here');
+
+    // Return a placeholder response
+    return {
+      text: '// Set GROQ_API_KEY environment variable for AI completions' + END_TOKEN,
+      finishReason: 'stop',
+    };
+  }
+
+  const prompt = buildPrompt(request);
+
+  try {
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        max_tokens: 150,
+        temperature: 0.2, // Low temperature for more deterministic completions
+        stop: [END_TOKEN, '\n\n\n', '```'], // Stop sequences
+      }),
+      signal,
     });
-  });
 
-  // Check if aborted
-  if (signal.aborted) {
-    return { text: '', finishReason: 'cancelled' };
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[LLM] Groq API error:', response.status, errorText);
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.choices || data.choices.length === 0) {
+      console.error('[LLM] No choices in response:', data);
+      return { text: '', finishReason: 'stop' };
+    }
+
+    let completionText = data.choices[0].message?.content || '';
+
+    // Clean up the response
+    // Remove any markdown code fences if the model included them
+    completionText = completionText.replace(/^```[\w]*\n?/gm, '').replace(/```$/gm, '');
+
+    // Ensure it ends with the end token
+    if (!completionText.includes(END_TOKEN)) {
+      completionText = completionText.trimEnd() + END_TOKEN;
+    }
+
+    const finishReason = data.choices[0].finish_reason === 'length' ? 'length' : 'stop';
+
+    return {
+      text: completionText,
+      finishReason,
+    };
+  } catch (error) {
+    if (signal.aborted) {
+      return { text: '', finishReason: 'cancelled' };
+    }
+    throw error;
   }
-
-  // Generate dummy lorem ipsum completion (3-8 words)
-  const wordCount = Math.floor(Math.random() * 6) + 3;
-  const words: string[] = [];
-  for (let i = 0; i < wordCount; i++) {
-    words.push(LOREM_WORDS[Math.floor(Math.random() * LOREM_WORDS.length)]);
-  }
-
-  const completionText = words.join(' ') + END_TOKEN;
-
-  return {
-    text: completionText,
-    finishReason: 'stop',
-  };
 }
 
 export function registerLLMHandlers() {
@@ -134,7 +169,7 @@ export function registerLLMHandlers() {
         if ((error as Error).message === 'Aborted') {
           return { text: '', finishReason: 'cancelled' };
         }
-        console.error('LLM completion error:', error);
+        console.error('[LLM] Completion error:', error);
         return null;
       } finally {
         pendingRequests.delete(requestId);

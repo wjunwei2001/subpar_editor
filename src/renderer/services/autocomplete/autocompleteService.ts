@@ -7,8 +7,6 @@ class AutocompleteService {
     const requestId = this.generateRequestId();
     this.currentRequestId = requestId;
 
-    console.log('[AutocompleteService] Calling LLM with requestId:', requestId);
-
     try {
       const response = await window.electronAPI.llm.complete({
         requestId,
@@ -16,7 +14,6 @@ class AutocompleteService {
         suffix: request.suffix,
         language: request.language,
       });
-      console.log('[AutocompleteService] LLM response:', response);
 
       // Check if this request was cancelled
       if (this.currentRequestId !== requestId) {
@@ -38,7 +35,7 @@ class AutocompleteService {
         requestId,
       };
     } catch (error) {
-      console.error('Autocomplete error:', error);
+      console.error('[AutocompleteService] Error:', error);
       return null;
     }
   }

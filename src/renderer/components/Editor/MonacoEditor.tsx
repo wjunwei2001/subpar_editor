@@ -37,7 +37,6 @@ const SUPPORTED_LANGUAGES = [
 SUPPORTED_LANGUAGES.forEach(lang => {
   monaco.languages.registerInlineCompletionsProvider(lang, loremInlineCompletionsProvider);
 });
-console.log('[Monaco] Registered inline completions provider for:', SUPPORTED_LANGUAGES);
 // Track if LSP providers are registered
 let lspProvidersRegistered = false;
 
@@ -170,7 +169,6 @@ export function MonacoEditor() {
     editorRef.current.addCommand(
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Space,
       () => {
-        console.log('[Monaco] Manually triggering inline suggestions');
         editorRef.current?.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {});
       }
     );

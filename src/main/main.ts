@@ -1,5 +1,10 @@
+import { config } from 'dotenv';
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+
+// Load .env file from project root
+config({ path: path.join(__dirname, '../../.env') });
+
 import { registerFileHandlers } from './ipc/fileHandlers';
 import { registerTerminalHandlers } from './ipc/terminalHandlers';
 import { registerLLMHandlers } from './ipc/llmHandlers';
