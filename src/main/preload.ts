@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('llm:complete', request),
     cancel: (requestId: string) => ipcRenderer.invoke('llm:cancel', requestId),
     cancelAll: () => ipcRenderer.invoke('llm:cancelAll'),
+  },
   git: {
     isRepo: (path: string) => ipcRenderer.invoke('git:isRepo', path),
     status: (repoPath: string) => ipcRenderer.invoke('git:status', repoPath),

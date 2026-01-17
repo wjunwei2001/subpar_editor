@@ -27,6 +27,8 @@ export interface LLMCompletionRequest {
 export interface LLMCompletionResponse {
   text: string;
   finishReason: 'stop' | 'length' | 'cancelled';
+}
+
 // Git Types
 export type GitFileStatusCode = 'M' | 'A' | 'D' | 'R' | 'C' | 'U' | '?' | '!' | ' ';
 
@@ -95,6 +97,7 @@ export interface IElectronAPI {
     complete: (request: LLMCompletionRequest) => Promise<LLMCompletionResponse | null>;
     cancel: (requestId: string) => Promise<boolean>;
     cancelAll: () => Promise<boolean>;
+  };
   git: {
     isRepo: (path: string) => Promise<boolean>;
     status: (repoPath: string) => Promise<GitStatus>;
