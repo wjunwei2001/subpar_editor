@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGachaStore } from '../../store/gachaStore';
 import { LootboxChest } from './LootboxChest';
 import { LootboxResult } from './LootboxResult';
-import { Rarity, EffectType } from '@shared/gacha';
+import type { LootboxType } from '@shared/gachaTypes';
 import './LootboxModal.css';
 
 export function LootboxModal() {
@@ -11,9 +11,10 @@ export function LootboxModal() {
     isOpen,
     animationPhase,
     currentPull,
+    inventory,
     setAnimationPhase,
     closeLootbox,
-    startDemoPull,
+    startPull,
     claimReward,
   } = useGachaStore();
 
@@ -41,14 +42,18 @@ export function LootboxModal() {
     }
   }, [animationPhase, closeLootbox, claimReward]);
 
-  const handleDemoPull = useCallback((rarity?: Rarity, type?: EffectType) => {
-    startDemoPull(rarity, type);
-  }, [startDemoPull]);
+  const handlePull = useCallback((type: LootboxType) => {
+    if (inventory[type] > 0) {
+      startPull(type);
+    }
+  }, [inventory, startPull]);
 
   const isLegendary = currentPull?.rarity === 'legendary';
   const showScreenFlash = animationPhase === 'opening' && isLegendary;
 
   if (!isOpen) return null;
+
+  const totalLootboxes = inventory.basic + inventory.premium + inventory.legendary;
 
   return (
     <div className="lootbox-overlay" onClick={handleBackdropClick}>
@@ -79,37 +84,48 @@ export function LootboxModal() {
 
         <div className="lootbox-content">
           <h2 className="lootbox-title">
-            {animationPhase === 'idle' ? '🎰 LOOTBOX 🎰' : ''}
+            {animationPhase === 'idle' ? 'LOOTBOX' : ''}
           </h2>
 
           {animationPhase === 'idle' && (
-            <div className="lootbox-demo-buttons">
-              <p className="lootbox-subtitle">Demo Mode - Test Any Rarity</p>
-              <div className="rarity-buttons">
-                <button className="rarity-btn rarity-common" onClick={() => handleDemoPull('common')}>
-                  Common
+            <div className="lootbox-selector">
+              <p className="lootbox-subtitle">Select a lootbox to open</p>
+
+              <div className="lootbox-options">
+                <button
+                  className={`lootbox-option basic ${inventory.basic <= 0 ? 'empty' : ''}`}
+                  onClick={() => handlePull('basic')}
+                  disabled={inventory.basic <= 0}
+                >
+                  <div className="lootbox-emoji">📦</div>
+                  <div className="lootbox-label">Basic</div>
+                  <div className="lootbox-count">{inventory.basic} available</div>
                 </button>
-                <button className="rarity-btn rarity-uncommon" onClick={() => handleDemoPull('uncommon')}>
-                  Uncommon
+
+                <button
+                  className={`lootbox-option premium ${inventory.premium <= 0 ? 'empty' : ''}`}
+                  onClick={() => handlePull('premium')}
+                  disabled={inventory.premium <= 0}
+                >
+                  <div className="lootbox-emoji">🎁</div>
+                  <div className="lootbox-label">Premium</div>
+                  <div className="lootbox-count">{inventory.premium} available</div>
                 </button>
-                <button className="rarity-btn rarity-rare" onClick={() => handleDemoPull('rare')}>
-                  Rare
-                </button>
-                <button className="rarity-btn rarity-epic" onClick={() => handleDemoPull('epic')}>
-                  Epic
-                </button>
-                <button className="rarity-btn rarity-legendary" onClick={() => handleDemoPull('legendary')}>
-                  Legendary
+
+                <button
+                  className={`lootbox-option legendary ${inventory.legendary <= 0 ? 'empty' : ''}`}
+                  onClick={() => handlePull('legendary')}
+                  disabled={inventory.legendary <= 0}
+                >
+                  <div className="lootbox-emoji">👑</div>
+                  <div className="lootbox-label">Legendary</div>
+                  <div className="lootbox-count">{inventory.legendary} available</div>
                 </button>
               </div>
-              <div className="type-buttons">
-                <button className="type-btn type-positive" onClick={() => handleDemoPull(undefined, 'positive')}>
-                  Random Positive
-                </button>
-                <button className="type-btn type-negative" onClick={() => handleDemoPull(undefined, 'negative')}>
-                  Random Curse
-                </button>
-              </div>
+
+              {totalLootboxes === 0 && (
+                <p className="no-lootboxes">No lootboxes! Visit the Shop to get more.</p>
+              )}
             </div>
           )}
 
@@ -119,6 +135,7 @@ export function LootboxModal() {
                 key="chest"
                 phase={animationPhase}
                 rarity={currentPull?.rarity || 'common'}
+                lootboxType={currentPull?.lootboxType || 'basic'}
               />
             )}
 

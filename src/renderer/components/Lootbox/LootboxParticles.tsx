@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Rarity, RARITY_COLORS } from '@shared/gacha';
+import type { Rarity } from '@shared/gachaTypes';
+import { RARITY_COLORS } from '@shared/gachaConfig';
 
 interface LootboxParticlesProps {
   phase: 'anticipation' | 'opening' | 'reveal';

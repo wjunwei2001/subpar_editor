@@ -2,19 +2,13 @@ import { useState } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
 import { useGachaStore } from '../../store/gachaStore';
-<<<<<<< HEAD
 import { ShopModal } from '../Shop/ShopModal';
-import { GachaModal } from '../Gacha/GachaModal';
-=======
->>>>>>> 3f0247e14b51895efb3b6645366e3f089d47786a
 
 export function Toolbar() {
   const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
-  const { getTotalLootboxes } = useGachaStore();
+  const { getTotalLootboxes, openLootbox } = useGachaStore();
   const [shopOpen, setShopOpen] = useState(false);
-  const [gachaOpen, setGachaOpen] = useState(false);
   const { refreshStatus } = useGitStore();
-  const { openLootbox } = useGachaStore();
 
   const activeFileData = getActiveFileData();
   const isDirty = activeFileData?.isDirty || false;
@@ -87,7 +81,7 @@ export function Toolbar() {
           <span>🛒</span>
           Shop
         </button>
-        <button className="gacha-btn" onClick={() => setGachaOpen(true)}>
+        <button className="gacha-btn" onClick={openLootbox}>
           <span>🎰</span>
           Gacha
           {getTotalLootboxes() > 0 && (
@@ -100,13 +94,6 @@ export function Toolbar() {
         <span className="current-folder">{currentFolder}</span>
       )}
       <button
-        onClick={openLootbox}
-        title="Open Lootbox"
-        className="lootbox-button"
-      >
-        <span>🎰</span>
-      </button>
-      <button
         onClick={() => setPreferencesOpen(true)}
         title="Preferences"
         className="settings-button"
@@ -114,7 +101,6 @@ export function Toolbar() {
         <span>⚙️</span>
       </button>
       <ShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
-      <GachaModal isOpen={gachaOpen} onClose={() => setGachaOpen(false)} />
     </div>
   );
 }

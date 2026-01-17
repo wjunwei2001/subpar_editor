@@ -1,19 +1,21 @@
 import { motion } from 'framer-motion';
-import { Rarity, RARITY_COLORS } from '@shared/gacha';
+import type { Rarity, LootboxType } from '@shared/gachaTypes';
+import { RARITY_COLORS } from '@shared/gachaConfig';
 import { LootboxParticles } from './LootboxParticles';
 
 interface LootboxChestProps {
   phase: 'anticipation' | 'opening' | 'reveal';
   rarity: Rarity;
+  lootboxType: LootboxType;
 }
 
-export function LootboxChest({ phase, rarity }: LootboxChestProps) {
+export function LootboxChest({ phase, rarity, lootboxType }: LootboxChestProps) {
   const rarityColor = RARITY_COLORS[rarity];
 
-  // Chest variant based on rarity
+  // Chest variant based on lootbox type
   const getChestClass = () => {
-    if (rarity === 'legendary' || rarity === 'epic') return 'chest-legendary';
-    if (rarity === 'rare' || rarity === 'uncommon') return 'chest-premium';
+    if (lootboxType === 'legendary') return 'chest-legendary';
+    if (lootboxType === 'premium') return 'chest-premium';
     return '';
   };
 

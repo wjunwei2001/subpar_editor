@@ -78,7 +78,86 @@
   margin-bottom: 16px;
 }
 
-/* Demo Buttons */
+/* Lootbox Selector */
+.lootbox-selector {
+  text-align: center;
+}
+
+.lootbox-options {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.lootbox-option {
+  background: linear-gradient(145deg, #252540, #1a1a30);
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 120px;
+}
+
+.lootbox-option:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.lootbox-option.basic {
+  border-color: #9e9e9e;
+}
+
+.lootbox-option.basic:hover:not(:disabled) {
+  border-color: #bbb;
+  box-shadow: 0 8px 24px rgba(158, 158, 158, 0.2);
+}
+
+.lootbox-option.premium {
+  border-color: #4caf50;
+}
+
+.lootbox-option.premium:hover:not(:disabled) {
+  border-color: #66bb6a;
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+}
+
+.lootbox-option.legendary {
+  border-color: #ff9800;
+}
+
+.lootbox-option.legendary:hover:not(:disabled) {
+  border-color: #ffa726;
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.2);
+}
+
+.lootbox-option.empty {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lootbox-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.lootbox-label {
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.lootbox-count {
+  color: #888;
+  font-size: 12px;
+}
+
+.no-lootboxes {
+  color: #e94560;
+  margin-top: 24px;
+}
+
+/* Demo Buttons (legacy - can be removed) */
 .lootbox-demo-buttons {
   display: flex;
   flex-direction: column;
@@ -471,6 +550,16 @@
   background: rgba(255, 68, 68, 0.2);
   color: #ff4444;
   border: 1px solid #ff4444;
+}
+
+.result-type-indicator.neutral {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+  border: 1px solid #2196f3;
+}
+
+.result-icon.neutral {
+  animation: icon-bounce 0.6s ease-out;
 }
 
 .result-claim-btn {

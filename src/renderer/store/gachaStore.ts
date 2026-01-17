@@ -7,13 +7,20 @@ import type {
   BadgeCollection,
   ActiveEffect,
   SponsorBadge,
-  GachaFeature,
 } from '@shared/gachaTypes';
 import { performGachaPull } from '../utils/gachaLogic';
 import { applyEffect, removeEffect } from '../utils/effectApplicator';
 import { META_CURSE_CONFIG } from '@shared/gachaConfig';
 
+// Animation phases for the lootbox UI
+type AnimationPhase = 'idle' | 'anticipation' | 'opening' | 'reveal' | 'result';
+
 interface GachaState {
+  // Modal/Animation state
+  isOpen: boolean;
+  animationPhase: AnimationPhase;
+  currentPull: GachaPull | null;
+
   // Inventory
   inventory: LootboxInventory;
 
@@ -33,13 +40,20 @@ interface GachaState {
   hasImmunity: boolean;
   immunityExpiresAt: number | null;
 
-  // Actions
+  // Modal actions
+  openLootbox: () => void;
+  closeLootbox: () => void;
+  setAnimationPhase: (phase: AnimationPhase) => void;
+  claimReward: () => void;
+
+  // Inventory actions
   addLootbox: (type: LootboxType, amount?: number) => void;
   removeLootbox: (type: LootboxType) => void;
   getTotalLootboxes: () => number;
 
   // Gacha pull
   pull: (type: LootboxType) => GachaPull | null;
+  startPull: (type: LootboxType) => void;
 
   // Effect management
   addActiveEffect: (effect: ActiveEffect) => void;
@@ -65,9 +79,14 @@ interface GachaState {
 export const useGachaStore = create<GachaState>()(
   persist(
     (set, get) => ({
+      // Modal state
+      isOpen: false,
+      animationPhase: 'idle',
+      currentPull: null,
+
       inventory: {
-        basic: 0,
-        premium: 0,
+        basic: 3, // Start with demo lootboxes
+        premium: 1,
         legendary: 0,
       },
 
@@ -91,6 +110,26 @@ export const useGachaStore = create<GachaState>()(
       hasImmunity: false,
       immunityExpiresAt: null,
 
+      // Modal actions
+      openLootbox: () => set({ isOpen: true, animationPhase: 'idle', currentPull: null }),
+
+      closeLootbox: () => set({ isOpen: false, animationPhase: 'idle', currentPull: null }),
+
+      setAnimationPhase: (phase) => set({ animationPhase: phase }),
+
+      claimReward: () => {
+        const { currentPull, pullHistory } = get();
+        if (currentPull) {
+          set({
+            pullHistory: [...pullHistory.slice(-99), currentPull],
+            animationPhase: 'idle',
+            currentPull: null,
+            isOpen: false,
+          });
+        }
+      },
+
+      // Inventory actions
       addLootbox: (type, amount = 1) =>
         set((state) => ({
           inventory: {
@@ -112,6 +151,59 @@ export const useGachaStore = create<GachaState>()(
         return inventory.basic + inventory.premium + inventory.legendary;
       },
 
+      // Start a pull with animation
+      startPull: (type: LootboxType) => {
+        const state = get();
+
+        // Check inventory
+        if (state.inventory[type] <= 0) {
+          return;
+        }
+
+        // Check if price multiplier curse active
+        if (state.priceMultiplierPullsRemaining > 0) {
+          set((s) => ({
+            priceMultiplierPullsRemaining: s.priceMultiplierPullsRemaining - 1,
+            priceMultiplier: s.priceMultiplierPullsRemaining <= 1 ? 1 : s.priceMultiplier,
+          }));
+        }
+
+        // Check for bad luck curse
+        const hasBadLuck = state.badLuckExpiresAt && Date.now() < state.badLuckExpiresAt;
+
+        // Perform the pull
+        let pull = performGachaPull(type, hasBadLuck ? true : false);
+
+        // Check immunity before applying negative effects
+        if (pull.category === 'negative' && state.hasImmunity) {
+          // Immunity blocks negative effects - convert to neutral badge
+          pull = {
+            ...pull,
+            category: 'neutral',
+            effect: {
+              type: 'badge',
+              name: 'Immunity Block',
+              description: 'Your immunity shield blocked a curse!',
+              badge: 'citadel' as SponsorBadge,
+            },
+          } as GachaPull;
+        }
+
+        // Remove lootbox from inventory and set up animation
+        set((s) => ({
+          inventory: {
+            ...s.inventory,
+            [type]: s.inventory[type] - 1,
+          },
+          currentPull: pull,
+          animationPhase: 'anticipation',
+        }));
+
+        // Apply the effect (will be applied after animation completes)
+        applyEffect(pull, get, set);
+      },
+
+      // Direct pull without animation (for internal use)
       pull: (type: LootboxType) => {
         const state = get();
 
@@ -140,13 +232,13 @@ export const useGachaStore = create<GachaState>()(
             ...s.inventory,
             [type]: s.inventory[type] - 1,
           },
-          pullHistory: [...s.pullHistory.slice(-99), pull], // Keep last 100 pulls
+          pullHistory: [...s.pullHistory.slice(-99), pull],
         }));
 
         // Check immunity before applying negative effects
         if (pull.category === 'negative' && state.hasImmunity) {
           // Immunity blocks negative effects - convert to neutral
-          return {
+          const blockedPull = {
             ...pull,
             category: 'neutral',
             effect: {
@@ -156,6 +248,8 @@ export const useGachaStore = create<GachaState>()(
               badge: 'citadel' as SponsorBadge,
             },
           } as GachaPull;
+          applyEffect(blockedPull, get, set);
+          return blockedPull;
         }
 
         // Apply the effect
@@ -303,100 +397,3 @@ export const useGachaStore = create<GachaState>()(
     }
   )
 );
-import { GachaPull, LootboxType, performGachaPull, performDemoPull, Rarity, EffectType } from '@shared/gacha';
-
-type AnimationPhase = 'idle' | 'anticipation' | 'opening' | 'reveal' | 'result';
-
-interface GachaState {
-  // Modal state
-  isOpen: boolean;
-  animationPhase: AnimationPhase;
-  currentPull: GachaPull | null;
-
-  // Inventory
-  lootboxInventory: Record<LootboxType, number>;
-  pullHistory: GachaPull[];
-
-  // Actions
-  openLootbox: () => void;
-  closeLootbox: () => void;
-  startPull: (lootboxType: LootboxType) => void;
-  startDemoPull: (rarity?: Rarity, type?: EffectType) => void;
-  setAnimationPhase: (phase: AnimationPhase) => void;
-  claimReward: () => void;
-  addLootbox: (type: LootboxType, count?: number) => void;
-}
-
-export const useGachaStore = create<GachaState>((set, get) => ({
-  isOpen: false,
-  animationPhase: 'idle',
-  currentPull: null,
-
-  lootboxInventory: {
-    basic: 3, // Start with some demo lootboxes
-    premium: 1,
-    legendary: 0,
-  },
-  pullHistory: [],
-
-  openLootbox: () => set({ isOpen: true, animationPhase: 'idle', currentPull: null }),
-
-  closeLootbox: () => set({ isOpen: false, animationPhase: 'idle', currentPull: null }),
-
-  startPull: (lootboxType: LootboxType) => {
-    const { lootboxInventory } = get();
-    if (lootboxInventory[lootboxType] <= 0) {
-      return;
-    }
-
-    // Consume lootbox
-    set((state) => ({
-      lootboxInventory: {
-        ...state.lootboxInventory,
-        [lootboxType]: state.lootboxInventory[lootboxType] - 1,
-      },
-    }));
-
-    // Perform the pull
-    const pull = performGachaPull(lootboxType);
-
-    set({
-      currentPull: pull,
-      animationPhase: 'anticipation',
-    });
-  },
-
-  startDemoPull: (rarity?: Rarity, type?: EffectType) => {
-    // Demo pull without consuming inventory
-    const pull = performDemoPull(rarity, type);
-
-    set({
-      currentPull: pull,
-      animationPhase: 'anticipation',
-    });
-  },
-
-  setAnimationPhase: (phase: AnimationPhase) => set({ animationPhase: phase }),
-
-  claimReward: () => {
-    const { currentPull, pullHistory } = get();
-    if (currentPull) {
-      set({
-        pullHistory: [...pullHistory, currentPull],
-        animationPhase: 'idle',
-        currentPull: null,
-        isOpen: false,
-      });
-      // TODO: Apply the effect to the editor state
-    }
-  },
-
-  addLootbox: (type: LootboxType, count = 1) => {
-    set((state) => ({
-      lootboxInventory: {
-        ...state.lootboxInventory,
-        [type]: state.lootboxInventory[type] + count,
-      },
-    }));
-  },
-}));

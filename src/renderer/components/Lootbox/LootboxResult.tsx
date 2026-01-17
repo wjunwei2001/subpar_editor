@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { GachaPull, RARITY_COLORS } from '@shared/gacha';
+import type { GachaPull, GachaEffect, EffectCategory } from '@shared/gachaTypes';
+import { RARITY_COLORS } from '@shared/gachaConfig';
 
 interface LootboxResultProps {
   pull: GachaPull;
@@ -17,7 +18,9 @@ interface Sparkle {
 
 export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
   const rarityColor = RARITY_COLORS[pull.rarity];
-  const isPositive = pull.type === 'positive';
+  const isPositive = pull.category === 'positive';
+  const isNeutral = pull.category === 'neutral';
+  const isNegative = pull.category === 'negative';
   const isLegendary = pull.rarity === 'legendary';
 
   // Generate floating sparkles
@@ -32,39 +35,66 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
     }));
   }, [pull.rarity, isLegendary]);
 
-  // Icon based on effect type
+  // Get icon based on effect
   const getIcon = () => {
-    if (isPositive) {
-      switch (pull.feature) {
+    const effect = pull.effect;
+
+    if (effect.type === 'badge') {
+      return '🏷️';
+    }
+
+    if (effect.type === 'timer' || effect.type === 'quota') {
+      const feature = effect.feature;
+      switch (feature) {
         case 'lsp': return '🧠';
         case 'git': return '📦';
         case 'autocomplete': return '⌨️';
-        case 'editing': return '✏️';
-        case 'theme': return '🎨';
-        case 'color': return '👁️';
-        case 'all': return '👑';
-        case 'immunity': return '🛡️';
-        case 'infinite': return '♾️';
+        case 'codeEditing': return '✏️';
+        case 'themeMode': return '🎨';
+        case 'codeColour': return '👁️';
+        case 'agentsPanel': return '🤖';
+        case 'textSize': return '🔤';
+        case 'aspectRatio': return '📐';
         default: return '✨';
       }
-    } else {
-      switch (pull.feature) {
+    }
+
+    if (effect.type === 'special') {
+      switch (effect.effectId) {
+        case 'godMode': return '👑';
+        case 'immunityShield': return '🛡️';
+        case 'infiniteQuota': return '♾️';
+        default: return '✨';
+      }
+    }
+
+    if (effect.type === 'curse') {
+      const feature = effect.feature;
+      switch (feature) {
         case 'lsp': return '🐛';
-        case 'visibility': return '👻';
+        case 'codeColour': return '👻';
         case 'textSize': return '🔍';
         case 'autocomplete': return '😈';
-        case 'agents': return '📺';
-        case 'theme': return '🌈';
-        case 'editing': return '👹';
-        case 'aspect': return '🎭';
+        case 'agentsPanel': return '📺';
+        case 'themeMode': return '🌈';
+        case 'codeEditing': return '👹';
+        case 'aspectRatio': return '🎭';
         case 'git': return '💀';
-        case 'quota': return '📉';
-        case 'timer': return '⏰';
-        case 'luck': return '🍀';
-        case 'all': return '💥';
         default: return '💀';
       }
     }
+
+    if (effect.type === 'metaCurse') {
+      switch (effect.curseId) {
+        case 'lootboxAddict': return '🎰';
+        case 'badLuck': return '🍀';
+        case 'quotaDrain': return '📉';
+        case 'timerReduction': return '⏰';
+        default: return '💥';
+      }
+    }
+
+    return isPositive ? '✨' : isNegative ? '💀' : '🏷️';
   };
 
   // Format duration for display
@@ -75,6 +105,58 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
       return `${hours} hour${hours > 1 ? 's' : ''}`;
     }
     return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  };
+
+  // Get effect details string
+  const getEffectDetails = () => {
+    const effect = pull.effect;
+
+    switch (effect.type) {
+      case 'timer':
+        return `Duration: ${formatDuration(effect.durationMs)}`;
+      case 'quota':
+        return `+${effect.amount} tokens`;
+      case 'special':
+        return `Duration: ${formatDuration(effect.durationMs)}`;
+      case 'badge':
+        return 'Added to collection!';
+      case 'curse':
+        if (effect.durationMs) {
+          return `Duration: ${formatDuration(effect.durationMs)}`;
+        }
+        return 'Applied immediately!';
+      case 'metaCurse':
+        if (effect.durationMs) {
+          return `Duration: ${formatDuration(effect.durationMs)}`;
+        }
+        return 'Applied immediately!';
+      default:
+        return '';
+    }
+  };
+
+  // Get category label
+  const getCategoryLabel = (): string => {
+    switch (pull.category) {
+      case 'positive':
+        return 'BLESSING';
+      case 'neutral':
+        return 'BADGE';
+      case 'negative':
+        return 'CURSE';
+    }
+  };
+
+  // Get category emoji
+  const getCategoryEmoji = (): string => {
+    switch (pull.category) {
+      case 'positive':
+        return '✨';
+      case 'neutral':
+        return '🏷️';
+      case 'negative':
+        return '💀';
+    }
   };
 
   return (
@@ -117,7 +199,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
 
       {/* Icon */}
       <motion.div
-        className={`result-icon ${isPositive ? 'positive' : 'negative'}`}
+        className={`result-icon ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}
         initial={{ scale: 0.5, y: 50, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{
@@ -147,7 +229,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        {pull.effect}
+        {pull.effect.name}
       </motion.div>
 
       {/* Description */}
@@ -157,27 +239,20 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        {pull.description}
-        {pull.duration && (
-          <div style={{ marginTop: 4, color: '#888' }}>
-            Duration: {formatDuration(pull.duration)}
-          </div>
-        )}
-        {pull.quota && (
-          <div style={{ marginTop: 4, color: '#888' }}>
-            Quota: {pull.quota}
-          </div>
-        )}
+        {pull.effect.description}
+        <div style={{ marginTop: 4, color: '#888' }}>
+          {getEffectDetails()}
+        </div>
       </motion.div>
 
       {/* Type indicator */}
       <motion.div
-        className={`result-type-indicator ${isPositive ? 'positive' : 'negative'}`}
+        className={`result-type-indicator ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.45 }}
       >
-        {isPositive ? '✨ BLESSING' : '💀 CURSE'}
+        {getCategoryEmoji()} {getCategoryLabel()}
       </motion.div>
 
       {/* Claim button */}
@@ -190,7 +265,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        {isPositive ? 'Claim Reward' : 'Accept Fate'}
+        {isPositive ? 'Claim Reward' : isNegative ? 'Accept Fate' : 'Collect Badge'}
       </motion.button>
     </motion.div>
   );
