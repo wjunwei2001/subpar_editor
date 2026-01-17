@@ -57,6 +57,7 @@ interface EditorState {
   setFileDirty: (path: string, dirty: boolean) => void;
   saveFile: (path: string) => Promise<void>;
   reloadFile: (path: string) => Promise<void>;
+  refreshFileTree: () => Promise<void>;
   setTerminalId: (id: number | null) => void;
   setLspMode: (mode: LspMode) => void;
   setPreferencesOpen: (open: boolean) => void;
@@ -174,6 +175,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           f.path === path ? { ...f, content, isDirty: false } : f
         ),
       }));
+    }
+  },
+
+  refreshFileTree: async () => {
+    const currentFolder = get().currentFolder;
+    if (currentFolder) {
+      const entries = await window.electronAPI.fs.readDir(currentFolder);
+      set({ fileTree: entries });
     }
   },
 

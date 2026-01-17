@@ -180,11 +180,13 @@ export const useAgentStore = create<AgentStoreState>()(
             }
 
             // Apply file edits
+            const editedFiles: string[] = [];
             for (const edit of edits) {
               try {
                 console.log(`[Agent] Writing to ${edit.path}`);
                 await window.electronAPI.fs.writeFile(edit.path, edit.content);
                 console.log(`[Agent] Applied edit to ${edit.path}`);
+                editedFiles.push(edit.path);
                 // Reload file in editor if it's open
                 await useEditorStore.getState().reloadFile(edit.path);
               } catch (err) {
@@ -192,10 +194,26 @@ export const useAgentStore = create<AgentStoreState>()(
               }
             }
 
+            // Refresh file tree to show new files
+            if (editedFiles.length > 0) {
+              await useEditorStore.getState().refreshFileTree();
+            }
+
+            // Strip out <file_edit> tags from the displayed message
+            let displayContent = response.content
+              .replace(/<file_edit path="[^"]*">[\s\S]*?<\/file_edit>/g, '')
+              .trim();
+
+            // Add a summary of edited files
+            if (editedFiles.length > 0) {
+              const fileNames = editedFiles.map(f => f.split('/').pop()).join(', ');
+              displayContent += `\n\n✅ Edited ${editedFiles.length} file(s): ${fileNames}`;
+            }
+
             const assistantMessage: AgentMessage = {
               id: `msg-${Date.now()}`,
               role: 'assistant',
-              content: response.content,
+              content: displayContent,
               timestamp: Date.now(),
             };
 
