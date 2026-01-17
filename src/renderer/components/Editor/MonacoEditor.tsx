@@ -88,6 +88,108 @@ monaco.editor.defineTheme('vs-light-custom', {
   },
 });
 
+// Define invisible dark theme - text same color as background
+monaco.editor.defineTheme('invisible-dark', {
+  base: 'vs-dark',
+  inherit: false,
+  rules: [
+    { token: '', foreground: '1e1e1e', background: '1e1e1e' },
+    { token: 'comment', foreground: '1e1e1e' },
+    { token: 'keyword', foreground: '1e1e1e' },
+    { token: 'string', foreground: '1e1e1e' },
+    { token: 'number', foreground: '1e1e1e' },
+    { token: 'type', foreground: '1e1e1e' },
+    { token: 'class', foreground: '1e1e1e' },
+    { token: 'function', foreground: '1e1e1e' },
+    { token: 'variable', foreground: '1e1e1e' },
+    { token: 'constant', foreground: '1e1e1e' },
+    { token: 'parameter', foreground: '1e1e1e' },
+    { token: 'property', foreground: '1e1e1e' },
+    { token: 'operator', foreground: '1e1e1e' },
+    { token: 'punctuation', foreground: '1e1e1e' },
+    { token: 'tag', foreground: '1e1e1e' },
+    { token: 'attribute.name', foreground: '1e1e1e' },
+    { token: 'attribute.value', foreground: '1e1e1e' },
+  ],
+  colors: {
+    'editor.background': '#1e1e1e',
+    'editor.foreground': '#1e1e1e',
+    'editor.lineHighlightBackground': '#1e1e1e',
+    'editor.selectionBackground': '#264f78',
+    'editorCursor.foreground': '#1e1e1e',
+    'editorLineNumber.foreground': '#1e1e1e',
+    'editorLineNumber.activeForeground': '#1e1e1e',
+  },
+});
+
+// Define invisible light theme - text same color as background
+monaco.editor.defineTheme('invisible-light', {
+  base: 'vs',
+  inherit: false,
+  rules: [
+    { token: '', foreground: 'ffffff', background: 'ffffff' },
+    { token: 'comment', foreground: 'ffffff' },
+    { token: 'keyword', foreground: 'ffffff' },
+    { token: 'string', foreground: 'ffffff' },
+    { token: 'number', foreground: 'ffffff' },
+    { token: 'type', foreground: 'ffffff' },
+    { token: 'class', foreground: 'ffffff' },
+    { token: 'function', foreground: 'ffffff' },
+    { token: 'variable', foreground: 'ffffff' },
+    { token: 'constant', foreground: 'ffffff' },
+    { token: 'parameter', foreground: 'ffffff' },
+    { token: 'property', foreground: 'ffffff' },
+    { token: 'operator', foreground: 'ffffff' },
+    { token: 'punctuation', foreground: 'ffffff' },
+    { token: 'tag', foreground: 'ffffff' },
+    { token: 'attribute.name', foreground: 'ffffff' },
+    { token: 'attribute.value', foreground: 'ffffff' },
+  ],
+  colors: {
+    'editor.background': '#ffffff',
+    'editor.foreground': '#ffffff',
+    'editor.lineHighlightBackground': '#ffffff',
+    'editor.selectionBackground': '#add6ff',
+    'editorCursor.foreground': '#ffffff',
+    'editorLineNumber.foreground': '#ffffff',
+    'editorLineNumber.activeForeground': '#ffffff',
+  },
+});
+
+// Define invisible eye-pain theme - text same color as background
+monaco.editor.defineTheme('invisible-eye-pain', {
+  base: 'vs-dark',
+  inherit: false,
+  rules: [
+    { token: '', foreground: '2200ff', background: '2200ff' },
+    { token: 'comment', foreground: '2200ff' },
+    { token: 'keyword', foreground: '2200ff' },
+    { token: 'string', foreground: '2200ff' },
+    { token: 'number', foreground: '2200ff' },
+    { token: 'type', foreground: '2200ff' },
+    { token: 'class', foreground: '2200ff' },
+    { token: 'function', foreground: '2200ff' },
+    { token: 'variable', foreground: '2200ff' },
+    { token: 'constant', foreground: '2200ff' },
+    { token: 'parameter', foreground: '2200ff' },
+    { token: 'property', foreground: '2200ff' },
+    { token: 'operator', foreground: '2200ff' },
+    { token: 'punctuation', foreground: '2200ff' },
+    { token: 'tag', foreground: '2200ff' },
+    { token: 'attribute.name', foreground: '2200ff' },
+    { token: 'attribute.value', foreground: '2200ff' },
+  ],
+  colors: {
+    'editor.background': '#2200ff',
+    'editor.foreground': '#2200ff',
+    'editor.lineHighlightBackground': '#2200ff',
+    'editor.selectionBackground': '#af007080',
+    'editorCursor.foreground': '#2200ff',
+    'editorLineNumber.foreground': '#2200ff',
+    'editorLineNumber.activeForeground': '#2200ff',
+  },
+});
+
 // Register inline completions provider for all languages (Copilot-style autocomplete)
 const SUPPORTED_LANGUAGES = [
   'javascript', 'typescript', 'python', 'json', 'html', 'css', 'markdown', 'plaintext'
@@ -146,7 +248,7 @@ export function MonacoEditor() {
   const isInternalChange = useRef(false);
   const randomDecoratorRef = useRef<RandomDecorator | null>(null);
   const previousLineCountRef = useRef<number>(0);
-  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode, textSizeMode, colorMode, themePreference, codeEditingMode } = useEditorStore();
+  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode, textSizeMode, colorMode, themePreference, codeEditingMode, codeVisibilityMode } = useEditorStore();
 
   // Get active file data
   const activeFileData = openFiles.find((f) => f.path === activeFile);
@@ -316,19 +418,29 @@ export function MonacoEditor() {
     };
   }, []);
 
-  // Update Monaco theme based on color mode and theme preference
+  // Update Monaco theme based on color mode, theme preference, and visibility mode
   useEffect(() => {
     if (!editorRef.current) return;
 
     let themeName: string;
-    if (colorMode === 'negative') {
-      themeName = 'eye-pain';
+    if (codeVisibilityMode === 'invisible') {
+      // Invisible mode - use invisible variant of current theme
+      if (colorMode === 'negative') {
+        themeName = 'invisible-eye-pain';
+      } else {
+        themeName = themePreference === 'light' ? 'invisible-light' : 'invisible-dark';
+      }
     } else {
-      themeName = themePreference === 'light' ? 'vs-light-custom' : 'vs-dark';
+      // Normal visibility
+      if (colorMode === 'negative') {
+        themeName = 'eye-pain';
+      } else {
+        themeName = themePreference === 'light' ? 'vs-light-custom' : 'vs-dark';
+      }
     }
 
     monaco.editor.setTheme(themeName);
-  }, [colorMode, themePreference]);
+  }, [colorMode, themePreference, codeVisibilityMode]);
 
   // Manage LSP mode changes - toggle Monaco's built-in validation
   useEffect(() => {

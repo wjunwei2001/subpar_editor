@@ -1,4 +1,4 @@
-import { useEditorStore, LspMode, AutocompleteMode, TextSizeMode, ColorMode, ThemePreference, CodeEditingMode } from '../../store/editorStore';
+import { useEditorStore, LspMode, AutocompleteMode, TextSizeMode, ColorMode, ThemePreference, CodeEditingMode, CodeVisibilityMode } from '../../store/editorStore';
 
 interface PreferencesProps {
   isOpen: boolean;
@@ -23,6 +23,8 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
     codeEditingQuota,
     setCodeEditingMode,
     setCodeEditingQuota,
+    codeVisibilityMode,
+    setCodeVisibilityMode,
   } = useEditorStore();
 
   if (!isOpen) return null;
@@ -63,6 +65,10 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
     if (!isNaN(value) && value >= 0) {
       setCodeEditingQuota(value);
     }
+  };
+
+  const handleCodeVisibilityModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCodeVisibilityMode(e.target.value as CodeVisibilityMode);
   };
 
   // Theme selection is only available in positive or neutral mode
@@ -157,6 +163,18 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
               ) : (
                 <span className="preferences-value eye-pain-label">Eye Pain (locked)</span>
               )}
+            </div>
+
+            <div className="preferences-row">
+              <span className="preferences-label">Code Visibility</span>
+              <select
+                className="preferences-select"
+                value={codeVisibilityMode}
+                onChange={handleCodeVisibilityModeChange}
+              >
+                <option value="visible">Visible</option>
+                <option value="invisible">Invisible</option>
+              </select>
             </div>
           </div>
 

@@ -13,6 +13,7 @@ export type TextSizeMode = 'neutral' | 'negative';
 export type ColorMode = 'positive' | 'neutral' | 'negative';
 export type ThemePreference = 'light' | 'dark';
 export type CodeEditingMode = 'positive' | 'neutral' | 'negative';
+export type CodeVisibilityMode = 'visible' | 'invisible';
 
 interface EditorState {
   // Folder state
@@ -41,6 +42,9 @@ interface EditorState {
   codeEditingMode: CodeEditingMode;
   codeEditingQuota: number;
 
+  // Code visibility mode
+  codeVisibilityMode: CodeVisibilityMode;
+
   // UI state
   preferencesOpen: boolean;
 
@@ -68,6 +72,7 @@ interface EditorState {
   setCodeEditingMode: (mode: CodeEditingMode) => void;
   setCodeEditingQuota: (quota: number) => void;
   consumeCodeEditingQuota: (amount?: number) => boolean;
+  setCodeVisibilityMode: (mode: CodeVisibilityMode) => void;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -94,6 +99,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   themePreference: 'dark',
   codeEditingMode: 'positive',
   codeEditingQuota: 99999,
+  codeVisibilityMode: 'visible',
   preferencesOpen: false,
   terminalId: null,
 
@@ -194,6 +200,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // Return true if still have quota, false if depleted
     return newQuota > 0;
   },
+  setCodeVisibilityMode: (mode) => set({ codeVisibilityMode: mode }),
 
   getActiveFileData: () => {
     const state = get();
