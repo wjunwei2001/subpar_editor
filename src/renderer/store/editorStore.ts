@@ -10,6 +10,9 @@ export interface OpenFile {
 export type LspMode = 'lsp' | 'off' | 'random';
 export type AutocompleteMode = 'positive' | 'neutral' | 'negative';
 export type TextSizeMode = 'neutral' | 'negative';
+export type ColorMode = 'positive' | 'neutral' | 'negative';
+export type ThemePreference = 'light' | 'dark';
+export type CodeEditingMode = 'positive' | 'neutral' | 'negative';
 
 interface EditorState {
   // Folder state
@@ -29,6 +32,14 @@ interface EditorState {
 
   // Text size mode
   textSizeMode: TextSizeMode;
+
+  // Color mode
+  colorMode: ColorMode;
+  themePreference: ThemePreference;
+
+  // Code editing mode
+  codeEditingMode: CodeEditingMode;
+  codeEditingQuota: number;
 
   // UI state
   preferencesOpen: boolean;
@@ -52,6 +63,11 @@ interface EditorState {
   setAutocompleteQuota: (quota: number) => void;
   consumeAutocompleteQuota: (amount?: number) => boolean;
   setTextSizeMode: (mode: TextSizeMode) => void;
+  setColorMode: (mode: ColorMode) => void;
+  setThemePreference: (theme: ThemePreference) => void;
+  setCodeEditingMode: (mode: CodeEditingMode) => void;
+  setCodeEditingQuota: (quota: number) => void;
+  consumeCodeEditingQuota: (amount?: number) => boolean;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -74,6 +90,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   autocompleteMode: 'neutral',
   autocompleteQuota: 0,
   textSizeMode: 'neutral',
+  colorMode: 'neutral',
+  themePreference: 'dark',
+  codeEditingMode: 'positive',
+  codeEditingQuota: 99999,
   preferencesOpen: false,
   terminalId: null,
 
@@ -158,6 +178,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return false;
   },
   setTextSizeMode: (mode) => set({ textSizeMode: mode }),
+  setColorMode: (mode) => set({ colorMode: mode }),
+  setThemePreference: (theme) => set({ themePreference: theme }),
+  setCodeEditingMode: (mode) => set({ codeEditingMode: mode }),
+  setCodeEditingQuota: (quota) => set({ codeEditingQuota: quota }),
+  consumeCodeEditingQuota: (amount = 1) => {
+    const state = get();
+    if (state.codeEditingQuota <= 0) {
+      // Already depleted
+      return false;
+    }
+    // Consume up to available quota
+    const newQuota = Math.max(0, state.codeEditingQuota - amount);
+    set({ codeEditingQuota: newQuota });
+    // Return true if still have quota, false if depleted
+    return newQuota > 0;
+  },
 
   getActiveFileData: () => {
     const state = get();

@@ -30,6 +30,64 @@ self.MonacoEnvironment = {
   },
 };
 
+// Define custom "Eye Pain" theme for negative color mode
+monaco.editor.defineTheme('eye-pain', {
+  base: 'vs-dark',
+  inherit: false,
+  rules: [
+    { token: '', foreground: '9ef023', background: '2200ff' },
+    { token: 'comment', foreground: 'ea00e9', fontStyle: 'italic' },
+    { token: 'keyword', foreground: 'fd0403', fontStyle: 'bold' },
+    { token: 'string', foreground: '9ef023' },
+    { token: 'number', foreground: 'd0064a' },
+    { token: 'type', foreground: '5d0bd6' },
+    { token: 'class', foreground: 'af0070' },
+    { token: 'function', foreground: '7f149f' },
+    { token: 'variable', foreground: 'ea00e9' },
+    { token: 'constant', foreground: 'fd0403' },
+    { token: 'parameter', foreground: 'd0064a' },
+    { token: 'property', foreground: '5d0bd6' },
+    { token: 'operator', foreground: '9ef023' },
+    { token: 'punctuation', foreground: 'ea00e9' },
+    { token: 'tag', foreground: 'fd0403' },
+    { token: 'attribute.name', foreground: 'af0070' },
+    { token: 'attribute.value', foreground: '9ef023' },
+  ],
+  colors: {
+    'editor.background': '#2200ff',
+    'editor.foreground': '#9ef023',
+    'editor.lineHighlightBackground': '#1a00cc',
+    'editor.selectionBackground': '#af007080',
+    'editor.inactiveSelectionBackground': '#5d0bd650',
+    'editorCursor.foreground': '#fd0403',
+    'editorWhitespace.foreground': '#5d0bd6',
+    'editorIndentGuide.background': '#5d0bd650',
+    'editorIndentGuide.activeBackground': '#ea00e9',
+    'editorLineNumber.foreground': '#ea00e9',
+    'editorLineNumber.activeForeground': '#fd0403',
+    'editorGutter.background': '#1a00cc',
+    'editor.wordHighlightBackground': '#af007040',
+    'editor.wordHighlightStrongBackground': '#fd040340',
+    'editorBracketMatch.background': '#9ef02340',
+    'editorBracketMatch.border': '#9ef023',
+    'minimap.background': '#1a00cc',
+    'scrollbarSlider.background': '#5d0bd680',
+    'scrollbarSlider.hoverBackground': '#ea00e980',
+    'scrollbarSlider.activeBackground': '#fd040380',
+  },
+});
+
+// Define light theme
+monaco.editor.defineTheme('vs-light-custom', {
+  base: 'vs',
+  inherit: true,
+  rules: [],
+  colors: {
+    'editor.background': '#ffffff',
+    'editor.foreground': '#333333',
+  },
+});
+
 // Register inline completions provider for all languages (Copilot-style autocomplete)
 const SUPPORTED_LANGUAGES = [
   'javascript', 'typescript', 'python', 'json', 'html', 'css', 'markdown', 'plaintext'
@@ -87,7 +145,8 @@ export function MonacoEditor() {
   const lastFileRef = useRef<string | null>(null);
   const isInternalChange = useRef(false);
   const randomDecoratorRef = useRef<RandomDecorator | null>(null);
-  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode, textSizeMode } = useEditorStore();
+  const previousLineCountRef = useRef<number>(0);
+  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode, textSizeMode, colorMode, themePreference, codeEditingMode } = useEditorStore();
 
   // Get active file data
   const activeFileData = openFiles.find((f) => f.path === activeFile);
@@ -133,14 +192,92 @@ export function MonacoEditor() {
 
     let changeTimeout: ReturnType<typeof setTimeout>;
 
-    editorRef.current.onDidChangeModelContent(() => {
+    editorRef.current.onDidChangeModelContent((event) => {
       // Skip if this change was triggered by us loading a file
       if (isInternalChange.current) return;
 
-      const value = editorRef.current?.getValue() || '';
-      const { activeFile: currentActiveFile, updateFileContent: update } = useEditorStore.getState();
+      const editor = editorRef.current;
+      if (!editor) return;
+
+      const model = editor.getModel();
+      if (!model) return;
+
+      const currentLineCount = model.getLineCount();
+      const {
+        activeFile: currentActiveFile,
+        updateFileContent: update,
+        codeEditingMode: editMode,
+        consumeCodeEditingQuota,
+        setCodeEditingMode,
+      } = useEditorStore.getState();
+
+      // Handle positive mode - consume quota based on characters typed
+      if (editMode === 'positive') {
+        // Calculate total characters added in this change
+        const charsTyped = event.changes.reduce((total, change) => {
+          return total + change.text.length;
+        }, 0);
+
+        if (charsTyped > 0) {
+          const consumed = consumeCodeEditingQuota(charsTyped);
+          if (!consumed) {
+            // Quota depleted - switch to read-only mode
+            setCodeEditingMode('neutral');
+            console.log('Code editing quota depleted! Switching to read-only mode.');
+          }
+        }
+      }
+
+      // Handle negative mode - random line deletion when a line is added
+      if (editMode === 'negative' && currentLineCount > previousLineCountRef.current && previousLineCountRef.current > 0) {
+        // A line was added - delete a random line!
+        const lineToDelete = Math.floor(Math.random() * currentLineCount) + 1;
+
+        // Don't delete the only line
+        if (currentLineCount > 1) {
+          isInternalChange.current = true;
+
+          // Get the range of the line to delete (including the newline)
+          const lineContent = model.getLineContent(lineToDelete);
+          const lineLength = lineContent.length;
+
+          let range: monaco.IRange;
+          if (lineToDelete === currentLineCount) {
+            // Last line - delete from end of previous line
+            range = {
+              startLineNumber: lineToDelete - 1,
+              startColumn: model.getLineMaxColumn(lineToDelete - 1),
+              endLineNumber: lineToDelete,
+              endColumn: lineLength + 1,
+            };
+          } else {
+            // Not last line - delete entire line including newline
+            range = {
+              startLineNumber: lineToDelete,
+              startColumn: 1,
+              endLineNumber: lineToDelete + 1,
+              endColumn: 1,
+            };
+          }
+
+          // Apply the edit
+          editor.executeEdits('cursed-delete', [{
+            range,
+            text: '',
+          }]);
+
+          isInternalChange.current = false;
+
+          // Show a toast-like message (log for now)
+          console.log(`Cursed! Deleted line ${lineToDelete}: "${lineContent.substring(0, 30)}..."`);
+        }
+      }
+
+      // Update previous line count
+      previousLineCountRef.current = model.getLineCount();
+
       if (currentActiveFile) {
-        update(currentActiveFile, value);
+        update(currentActiveFile, editor.getValue());
       }
 
       // Debounce LSP notifications (only if LSP mode is active)
@@ -148,7 +285,7 @@ export function MonacoEditor() {
       changeTimeout = setTimeout(() => {
         const { activeFile: file, lspMode: mode } = useEditorStore.getState();
         if (file && mode === 'lsp') {
-          lspClient.didChange(file, value);
+          lspClient.didChange(file, editor.getValue());
         }
       }, 300);
     });
@@ -178,6 +315,20 @@ export function MonacoEditor() {
       editorRef.current?.dispose();
     };
   }, []);
+
+  // Update Monaco theme based on color mode and theme preference
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    let themeName: string;
+    if (colorMode === 'negative') {
+      themeName = 'eye-pain';
+    } else {
+      themeName = themePreference === 'light' ? 'vs-light-custom' : 'vs-dark';
+    }
+
+    monaco.editor.setTheme(themeName);
+  }, [colorMode, themePreference]);
 
   // Manage LSP mode changes - toggle Monaco's built-in validation
   useEffect(() => {
@@ -253,6 +404,16 @@ export function MonacoEditor() {
     editorRef.current.updateOptions({ fontSize });
   }, [textSizeMode]);
 
+  // Handle code editing mode - read-only for neutral mode
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    // Set editor to read-only in neutral mode
+    editorRef.current.updateOptions({
+      readOnly: codeEditingMode === 'neutral',
+    });
+  }, [codeEditingMode]);
+
   // Handle file changes - only when activeFile changes
   useEffect(() => {
     if (!editorRef.current || !activeFile || !activeFileData) return;
@@ -271,6 +432,9 @@ export function MonacoEditor() {
       isInternalChange.current = true;
       model.setValue(activeFileData.content);
       isInternalChange.current = false;
+
+      // Initialize line count for curse tracking
+      previousLineCountRef.current = model.getLineCount();
 
       const language = getLanguage(activeFile);
       monaco.editor.setModelLanguage(model, language);

@@ -4,6 +4,7 @@
   box-sizing: border-box;
 }
 
+/* Default (Dark Theme) */
 :root {
   --bg-primary: #1e1e1e;
   --bg-secondary: #252526;
@@ -13,6 +14,67 @@
   --accent: #007acc;
   --border: #3c3c3c;
   --hover: #2a2d2e;
+}
+
+/* Light Theme */
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f3f3;
+  --bg-tertiary: #e8e8e8;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent: #0066cc;
+  --border: #d4d4d4;
+  --hover: #e5e5e5;
+}
+
+/* Eye Pain Theme (Negative Mode) */
+.theme-eye-pain {
+  --bg-primary: #2200ff;
+  --bg-secondary: #1a00cc;
+  --bg-tertiary: #1500aa;
+  --text-primary: #9ef023;
+  --text-secondary: #ea00e9;
+  --accent: #fd0403;
+  --border: #5d0bd6;
+  --hover: #af0070;
+}
+
+.theme-eye-pain .status-bar {
+  background-color: #d0064a;
+}
+
+.theme-eye-pain .preferences-select,
+.theme-eye-pain .preferences-input {
+  background-color: #1500aa;
+  border-color: #5d0bd6;
+  color: #9ef023;
+}
+
+.theme-eye-pain .preferences-panel {
+  background-color: #2200ff;
+  border-color: #ea00e9;
+}
+
+.theme-eye-pain .preferences-header {
+  background-color: #1500aa;
+  border-color: #5d0bd6;
+}
+
+.theme-eye-pain .preferences-row {
+  background-color: #1a00cc;
+}
+
+.theme-eye-pain .eye-pain-label {
+  color: #fd0403;
+  font-weight: bold;
+  animation: eyePainPulse 0.5s infinite alternate;
+}
+
+@keyframes eyePainPulse {
+  0% { color: #fd0403; }
+  50% { color: #ea00e9; }
+  100% { color: #9ef023; }
 }
 
 html, body, #root {
