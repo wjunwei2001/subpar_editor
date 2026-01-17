@@ -65,6 +65,14 @@ Be friendly but professional.`;
 /**
  * Call Gemini API for agent chat
  */
+// Truncate content to avoid rate limits (roughly 4 chars per token)
+const MAX_CONTENT_CHARS = 30000; // ~7500 tokens
+
+function truncateContent(content: string): string {
+  if (content.length <= MAX_CONTENT_CHARS) return content;
+  return content.slice(0, MAX_CONTENT_CHARS) + '\n\n... [TRUNCATED - file too large]';
+}
+
 async function callAgentLLM(
   request: AgentChatRequest,
   signal: AbortSignal,
@@ -80,11 +88,15 @@ async function callAgentLLM(
   }
 
   try {
-    // Convert messages to Gemini format
+    // Convert messages to Gemini format, truncating large content
     const contents = request.messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
+      parts: [{ text: truncateContent(m.content) }],
     }));
+
+    // Log context size for debugging
+    const totalChars = contents.reduce((acc, c) => acc + c.parts[0].text.length, 0);
+    console.log(`[Agent] Sending ${contents.length} messages, ~${totalChars} chars (~${Math.round(totalChars/4)} tokens)`);
 
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: "POST",
@@ -97,7 +109,7 @@ async function callAgentLLM(
           parts: [{ text: buildSystemPrompt() }],
         },
         generationConfig: {
-          maxOutputTokens: 1024,
+          maxOutputTokens: 8192,
           temperature: 0.7,
         },
       }),

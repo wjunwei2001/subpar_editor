@@ -1,14 +1,25 @@
 import * as monaco from 'monaco-editor';
 
-const DECORATION_COLORS = [
-  'random-error',
-  'random-warning',
-  'random-info',
+// Text color classes
+const TEXT_COLORS = [
+  'random-text-red',
+  'random-text-green',
+  'random-text-blue',
+  'random-text-yellow',
+  'random-text-purple',
+  'random-text-cyan',
+  'random-text-orange',
+  'random-text-pink',
+];
+
+// Background highlight classes
+const HIGHLIGHT_COLORS = [
   'random-highlight-1',
   'random-highlight-2',
   'random-highlight-3',
 ];
 
+// Squiggle classes
 const SQUIGGLE_CLASSES = [
   'random-squiggle-error',
   'random-squiggle-warning',
@@ -69,16 +80,21 @@ export class RandomDecorator {
     if (lineCount === 0) return;
 
     const decorations: monaco.editor.IModelDeltaDecoration[] = [];
+    // Always create at least 60% of max decorations
+    const minDecorations = Math.floor(this.options.maxDecorations * 0.6);
     const numDecorations = Math.min(
       this.options.maxDecorations,
-      Math.floor(Math.random() * this.options.maxDecorations) + 1
+      minDecorations + Math.floor(Math.random() * (this.options.maxDecorations - minDecorations))
     );
 
-    for (let i = 0; i < numDecorations; i++) {
+    // Try harder to create decorations - retry on failure
+    let attempts = 0;
+    while (decorations.length < numDecorations && attempts < numDecorations * 3) {
       const decoration = this.createRandomDecoration(model, lineCount);
       if (decoration) {
         decorations.push(decoration);
       }
+      attempts++;
     }
 
     this.decorationIds = this.editor.deltaDecorations(
@@ -96,7 +112,35 @@ export class RandomDecorator {
 
     if (lineContent.trim().length === 0) return null;
 
-    // Find a random word or segment in the line
+    // Choose decoration type: 30% whole line, 70% word-based
+    const isWholeLine = Math.random() < 0.3;
+
+    if (isWholeLine) {
+      // Whole line decoration
+      const rand = Math.random();
+      if (rand < 0.5) {
+        // Line background highlight
+        const highlightClass = HIGHLIGHT_COLORS[Math.floor(Math.random() * HIGHLIGHT_COLORS.length)];
+        return {
+          range: new monaco.Range(lineNumber, 1, lineNumber, lineContent.length + 1),
+          options: {
+            isWholeLine: true,
+            className: highlightClass,
+          },
+        };
+      } else {
+        // Whole line text color
+        const colorClass = TEXT_COLORS[Math.floor(Math.random() * TEXT_COLORS.length)];
+        return {
+          range: new monaco.Range(lineNumber, 1, lineNumber, lineContent.length + 1),
+          options: {
+            inlineClassName: colorClass,
+          },
+        };
+      }
+    }
+
+    // Word-based decoration
     const words = lineContent.match(/\b\w+\b/g);
     if (!words || words.length === 0) return null;
 
@@ -104,28 +148,35 @@ export class RandomDecorator {
     const startCol = lineContent.indexOf(randomWord) + 1;
     const endCol = startCol + randomWord.length;
 
-    const isSquiggle = Math.random() > 0.5;
+    // Choose decoration type: 35% text color, 35% squiggle, 30% highlight
+    const rand = Math.random();
 
-    if (isSquiggle) {
-      const squiggleClass = SQUIGGLE_CLASSES[
-        Math.floor(Math.random() * SQUIGGLE_CLASSES.length)
-      ];
-      return {
-        range: new monaco.Range(lineNumber, startCol, lineNumber, endCol),
-        options: {
-          className: squiggleClass,
-          hoverMessage: { value: this.getRandomMessage() },
-          inlineClassName: squiggleClass,
-        },
-      };
-    } else {
-      const colorClass = DECORATION_COLORS[
-        Math.floor(Math.random() * DECORATION_COLORS.length)
-      ];
+    if (rand < 0.35) {
+      // Text color change
+      const colorClass = TEXT_COLORS[Math.floor(Math.random() * TEXT_COLORS.length)];
       return {
         range: new monaco.Range(lineNumber, startCol, lineNumber, endCol),
         options: {
           inlineClassName: colorClass,
+        },
+      };
+    } else if (rand < 0.7) {
+      // Squiggle
+      const squiggleClass = SQUIGGLE_CLASSES[Math.floor(Math.random() * SQUIGGLE_CLASSES.length)];
+      return {
+        range: new monaco.Range(lineNumber, startCol, lineNumber, endCol),
+        options: {
+          inlineClassName: squiggleClass,
+          hoverMessage: { value: this.getRandomMessage() },
+        },
+      };
+    } else {
+      // Background highlight
+      const highlightClass = HIGHLIGHT_COLORS[Math.floor(Math.random() * HIGHLIGHT_COLORS.length)];
+      return {
+        range: new monaco.Range(lineNumber, startCol, lineNumber, endCol),
+        options: {
+          inlineClassName: highlightClass,
         },
       };
     }

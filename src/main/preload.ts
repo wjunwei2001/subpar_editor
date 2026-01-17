@@ -25,6 +25,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   llm: {
     complete: (request: LLMCompletionRequest) =>
       ipcRenderer.invoke('llm:complete', request),
+    completeInsulting: (request: LLMCompletionRequest) =>
+      ipcRenderer.invoke('llm:completeInsulting', request),
     cancel: (requestId: string) => ipcRenderer.invoke('llm:cancel', requestId),
     cancelAll: () => ipcRenderer.invoke('llm:cancelAll'),
   },

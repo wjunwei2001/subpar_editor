@@ -14,7 +14,7 @@ import { useGitStore } from './store/gitStore';
 type RightPanelTab = 'git' | 'agent';
 
 function App() {
-  const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen } = useEditorStore();
+  const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference } = useEditorStore();
   const { refreshStatus } = useGitStore();
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('git');
 
@@ -24,6 +24,22 @@ function App() {
       setTerminalId(id);
     });
   }, [setTerminalId]);
+
+  // Apply theme class based on color mode and theme preference
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Remove all theme classes
+    root.classList.remove('theme-light', 'theme-dark', 'theme-eye-pain');
+
+    if (colorMode === 'negative') {
+      // Eye pain mode overrides user preference
+      root.classList.add('theme-eye-pain');
+    } else {
+      // Positive and neutral modes use user preference
+      root.classList.add(themePreference === 'light' ? 'theme-light' : 'theme-dark');
+    }
+  }, [colorMode, themePreference]);
 
   // Refresh git status when folder changes
   useEffect(() => {
