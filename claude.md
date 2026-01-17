@@ -514,7 +514,7 @@ class TextSizeController {
 
 Each pull grants ONE of the following:
 
-#### Positive Effects (70% of pool)
+#### Positive Effects (50% of pool)
 
 **Timer-Based Features:**
 - LSP (per language): 30min (Common), 60min (Uncommon), 120min (Rare)
@@ -534,18 +534,27 @@ Each pull grants ONE of the following:
 - "Immunity Shield" - Prevents negative effects for 24 hours
 - "Infinite Quota" - One feature gets unlimited quota for 24 hours
 
-#### Negative Effects (30% of pool)
+#### Neutral Effects (30% of pool)
+- Collectable badges of sponsor companies
+  - Virtu
+  - Marhsall Wace
+  - Ahrefs
+  - QRT
+  - SquarePoint
+  - Citadel
+  - Optiver
+
+#### Negative Effects (20% of pool)
 
 **Curses that ACTIVATE negative states:**
-- "LSP Corruption" - Activates LSP random highlights for 10 minutes
-- "Autocomplete Curse" - Activates passive-aggressive autocomplete for 15 minutes
-- "Ad Invasion" - Activates Agents Panel ads for 20 minutes
-- "Invisible Code" - Activates invisible text for 5 minutes
-- "Gray Hell" - Activates average mode for 10 minutes
-- "Delete Demon" - Activates random deletions for 5 minutes
-- "Aspect Chaos" - Activates fucked aspect ratio for 10 minutes
-- "Git Sabotage" - Activates destructive git for 15 minutes
-- "Tiny Text" - Activates unreadable text size for 10 minutes
+- "LSP? Only MCP" - Activates LSP random highlights for 10 minutes
+- "Autocomplate" - Activates passive-aggressive autocomplete for 15 minutes
+- "AI: Ads increased" - Activates Agents Panel ads for 20 minutes
+- "Now you see me now you don't" - Activates invisible text for 5 minutes
+- "You don't need those" - Activates random deletions for 5 minutes
+- "Ratioed" - Activates fucked aspect ratio for 10 minutes
+- "Git Gud" - Activates destructive git for 15 minutes
+- "Is this for ants?" - Activates unreadable text size for 10 minutes
 
 **Meta Curses:**
 - "Lootbox Addict" - Next 3 pulls cost double
