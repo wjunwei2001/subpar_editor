@@ -22,4 +22,34 @@ contextBridge.exposeInMainWorld('electronAPI', {
     execute: (filePath: string, terminalId: number) =>
       ipcRenderer.send('run:execute', filePath, terminalId),
   },
+  git: {
+    isRepo: (path: string) => ipcRenderer.invoke('git:isRepo', path),
+    status: (repoPath: string) => ipcRenderer.invoke('git:status', repoPath),
+    branch: (repoPath: string) => ipcRenderer.invoke('git:branch', repoPath),
+    stage: (repoPath: string, files: string[]) =>
+      ipcRenderer.invoke('git:stage', repoPath, files),
+    unstage: (repoPath: string, files: string[]) =>
+      ipcRenderer.invoke('git:unstage', repoPath, files),
+    commit: (repoPath: string, message: string) =>
+      ipcRenderer.invoke('git:commit', repoPath, message),
+    diff: (repoPath: string, filePath?: string) =>
+      ipcRenderer.invoke('git:diff', repoPath, filePath),
+    onStatusChanged: (callback: () => void) => {
+      ipcRenderer.on('git:statusChanged', () => callback());
+    },
+  },
+  lsp: {
+    start: (language: string, rootPath: string) =>
+      ipcRenderer.invoke('lsp:start', language, rootPath),
+    stop: (serverId: string) => ipcRenderer.invoke('lsp:stop', serverId),
+    request: (serverId: string, method: string, params: unknown) =>
+      ipcRenderer.invoke('lsp:request', serverId, method, params),
+    notify: (serverId: string, method: string, params: unknown) =>
+      ipcRenderer.send('lsp:notify', serverId, method, params),
+    onNotification: (callback: (serverId: string, method: string, params: unknown) => void) => {
+      ipcRenderer.on('lsp:notification', (_event, serverId, method, params) =>
+        callback(serverId, method, params)
+      );
+    },
+  },
 });

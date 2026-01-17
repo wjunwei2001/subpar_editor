@@ -1,15 +1,20 @@
 import { create } from 'zustand';
 import type { FileEntry } from '@shared/types';
 
+export interface OpenFile {
+  path: string;
+  content: string;
+  isDirty: boolean;
+}
+
 interface EditorState {
   // Folder state
   currentFolder: string | null;
   fileTree: FileEntry[];
 
-  // Editor state
-  currentFile: string | null;
-  fileContent: string;
-  isDirty: boolean;
+  // Editor state - multiple files
+  openFiles: OpenFile[];
+  activeFile: string | null;
 
   // Terminal state
   terminalId: number | null;
@@ -17,24 +22,124 @@ interface EditorState {
   // Actions
   setCurrentFolder: (folder: string | null) => void;
   setFileTree: (tree: FileEntry[]) => void;
+  openFile: (path: string, content: string) => void;
+  closeFile: (path: string) => void;
+  setActiveFile: (path: string | null) => void;
+  updateFileContent: (path: string, content: string) => void;
+  setFileDirty: (path: string, dirty: boolean) => void;
+  saveFile: (path: string) => Promise<void>;
+  setTerminalId: (id: number | null) => void;
+
+  // Computed helpers
+  getActiveFileData: () => OpenFile | null;
+
+  // Legacy compatibility
+  currentFile: string | null;
+  fileContent: string;
+  isDirty: boolean;
   setCurrentFile: (path: string | null) => void;
   setFileContent: (content: string) => void;
   setIsDirty: (dirty: boolean) => void;
-  setTerminalId: (id: number | null) => void;
 }
 
-export const useEditorStore = create<EditorState>((set) => ({
+export const useEditorStore = create<EditorState>((set, get) => ({
   currentFolder: null,
   fileTree: [],
+  openFiles: [],
+  activeFile: null,
+  terminalId: null,
+
+  // Legacy computed properties (these must be accessed via getState() or selectors)
   currentFile: null,
   fileContent: '',
   isDirty: false,
-  terminalId: null,
 
   setCurrentFolder: (folder) => set({ currentFolder: folder }),
   setFileTree: (tree) => set({ fileTree: tree }),
-  setCurrentFile: (path) => set({ currentFile: path, isDirty: false }),
-  setFileContent: (content) => set({ fileContent: content }),
-  setIsDirty: (dirty) => set({ isDirty: dirty }),
+
+  openFile: (path, content) => set((state) => {
+    // Check if file is already open
+    const existing = state.openFiles.find((f) => f.path === path);
+    if (existing) {
+      // Just switch to it
+      return { activeFile: path };
+    }
+    // Add new file
+    return {
+      openFiles: [...state.openFiles, { path, content, isDirty: false }],
+      activeFile: path,
+    };
+  }),
+
+  closeFile: (path) => set((state) => {
+    const newOpenFiles = state.openFiles.filter((f) => f.path !== path);
+    let newActiveFile = state.activeFile;
+
+    // If closing the active file, switch to another
+    if (state.activeFile === path) {
+      const closedIndex = state.openFiles.findIndex((f) => f.path === path);
+      if (newOpenFiles.length > 0) {
+        // Try to switch to the next file, or previous if at end
+        const newIndex = Math.min(closedIndex, newOpenFiles.length - 1);
+        newActiveFile = newOpenFiles[newIndex].path;
+      } else {
+        newActiveFile = null;
+      }
+    }
+
+    return { openFiles: newOpenFiles, activeFile: newActiveFile };
+  }),
+
+  setActiveFile: (path) => set({ activeFile: path }),
+
+  updateFileContent: (path, content) => set((state) => ({
+    openFiles: state.openFiles.map((f) =>
+      f.path === path ? { ...f, content, isDirty: true } : f
+    ),
+  })),
+
+  setFileDirty: (path, dirty) => set((state) => ({
+    openFiles: state.openFiles.map((f) =>
+      f.path === path ? { ...f, isDirty: dirty } : f
+    ),
+  })),
+
+  saveFile: async (path) => {
+    const file = get().openFiles.find((f) => f.path === path);
+    if (file) {
+      await window.electronAPI.fs.writeFile(path, file.content);
+      set((state) => ({
+        openFiles: state.openFiles.map((f) =>
+          f.path === path ? { ...f, isDirty: false } : f
+        ),
+      }));
+    }
+  },
+
   setTerminalId: (id) => set({ terminalId: id }),
+
+  getActiveFileData: () => {
+    const state = get();
+    return state.openFiles.find((f) => f.path === state.activeFile) || null;
+  },
+
+  // Legacy setters for compatibility
+  setCurrentFile: (path) => {
+    if (path) {
+      // This is called when clicking a file - need to load content first
+      set({ activeFile: path });
+    }
+  },
+  setFileContent: (content) => {
+    const activeFile = get().activeFile;
+    if (activeFile) {
+      get().updateFileContent(activeFile, content);
+    }
+  },
+  setIsDirty: (dirty) => {
+    const activeFile = get().activeFile;
+    if (activeFile) {
+      get().setFileDirty(activeFile, dirty);
+    }
+  },
 }));

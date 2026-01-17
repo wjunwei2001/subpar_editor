@@ -1,12 +1,17 @@
 import { useEffect } from 'react';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { FileTree } from './components/FileTree/FileTree';
+import { TabBar } from './components/TabBar/TabBar';
 import { MonacoEditor } from './components/Editor/MonacoEditor';
 import { Terminal } from './components/Terminal/Terminal';
+import { GitPanel } from './components/Git/GitPanel';
+import { StatusBar } from './components/StatusBar/StatusBar';
 import { useEditorStore } from './store/editorStore';
+import { useGitStore } from './store/gitStore';
 
 function App() {
-  const { currentFolder, currentFile, setTerminalId } = useEditorStore();
+  const { currentFolder, activeFile, setTerminalId } = useEditorStore();
+  const { refreshStatus } = useGitStore();
 
   useEffect(() => {
     // Create terminal on app start
@@ -14,6 +19,18 @@ function App() {
       setTerminalId(id);
     });
   }, [setTerminalId]);
+
+  // Refresh git status when folder changes
+  useEffect(() => {
+    if (currentFolder) {
+      refreshStatus(currentFolder);
+      // Set up periodic refresh
+      const interval = setInterval(() => {
+        refreshStatus(currentFolder);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [currentFolder, refreshStatus]);
 
   return (
     <div className="app-container">
@@ -30,8 +47,9 @@ function App() {
           )}
         </div>
         <div className="editor-area">
+          <TabBar />
           <div className="editor-container">
-            {currentFile ? (
+            {activeFile ? (
               <MonacoEditor />
             ) : (
               <div className="empty-state">
@@ -46,7 +64,11 @@ function App() {
             </div>
           </div>
         </div>
+        <div className="git-sidebar">
+          <GitPanel />
+        </div>
       </div>
+      <StatusBar />
     </div>
   );
 }

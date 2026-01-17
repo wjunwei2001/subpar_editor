@@ -17,6 +17,53 @@ export interface TerminalSize {
   rows: number;
 }
 
+// Git Types
+export type GitFileStatusCode = 'M' | 'A' | 'D' | 'R' | 'C' | 'U' | '?' | '!' | ' ';
+
+export interface GitFileStatus {
+  path: string;
+  index: GitFileStatusCode;
+  workingDir: GitFileStatusCode;
+}
+
+export interface GitStatus {
+  isRepo: boolean;
+  branch: string | null;
+  ahead: number;
+  behind: number;
+  files: GitFileStatus[];
+  staged: string[];
+  modified: string[];
+  untracked: string[];
+}
+
+export interface GitBranchInfo {
+  current: string;
+  all: string[];
+}
+
+// LSP Types
+export interface LspServerInfo {
+  id: string;
+  language: string;
+  running: boolean;
+}
+
+export interface LspDiagnostic {
+  uri: string;
+  diagnostics: Array<{
+    range: { start: LspPosition; end: LspPosition };
+    message: string;
+    severity: 1 | 2 | 3 | 4;
+    source?: string;
+  }>;
+}
+
+export interface LspPosition {
+  line: number;
+  character: number;
+}
+
 export interface IElectronAPI {
   fs: {
     openFolder: () => Promise<string | null>;
@@ -33,6 +80,23 @@ export interface IElectronAPI {
   };
   run: {
     execute: (filePath: string, terminalId: number) => void;
+  };
+  git: {
+    isRepo: (path: string) => Promise<boolean>;
+    status: (repoPath: string) => Promise<GitStatus>;
+    branch: (repoPath: string) => Promise<GitBranchInfo>;
+    stage: (repoPath: string, files: string[]) => Promise<void>;
+    unstage: (repoPath: string, files: string[]) => Promise<void>;
+    commit: (repoPath: string, message: string) => Promise<void>;
+    diff: (repoPath: string, filePath?: string) => Promise<string>;
+    onStatusChanged: (callback: () => void) => void;
+  };
+  lsp: {
+    start: (language: string, rootPath: string) => Promise<string>;
+    stop: (serverId: string) => Promise<void>;
+    request: (serverId: string, method: string, params: unknown) => Promise<unknown>;
+    notify: (serverId: string, method: string, params: unknown) => void;
+    onNotification: (callback: (serverId: string, method: string, params: unknown) => void) => void;
   };
 }
 

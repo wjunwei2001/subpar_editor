@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { FileEntry } from '@shared/types';
 import { useEditorStore } from '../../store/editorStore';
+import { useGitStore } from '../../store/gitStore';
+import { GitStatusIcon } from '../Git/GitStatusIcon';
 
 interface FileTreeItemProps {
   entry: FileEntry;
@@ -10,7 +12,14 @@ interface FileTreeItemProps {
 export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [children, setChildren] = useState<FileEntry[]>([]);
-  const { currentFile, setCurrentFile, setFileContent } = useEditorStore();
+  const { activeFile, currentFolder, openFile } = useEditorStore();
+  const { getFileStatus } = useGitStore();
+
+  // Get relative path for git status lookup
+  const relativePath = currentFolder
+    ? entry.path.replace(currentFolder, '').replace(/^[\\/]/, '')
+    : entry.name;
+  const gitStatus = getFileStatus(relativePath);
 
   const handleClick = async () => {
     if (entry.isDirectory) {
@@ -21,12 +30,11 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       setIsExpanded(!isExpanded);
     } else {
       const content = await window.electronAPI.fs.readFile(entry.path);
-      setCurrentFile(entry.path);
-      setFileContent(content);
+      openFile(entry.path, content);
     }
   };
 
-  const isSelected = currentFile === entry.path;
+  const isSelected = activeFile === entry.path;
   const icon = entry.isDirectory
     ? isExpanded ? '📂' : '📁'
     : getFileIcon(entry.name);
@@ -40,6 +48,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       >
         <span className="icon">{icon}</span>
         <span className="name">{entry.name}</span>
+        {gitStatus && !entry.isDirectory && (
+          <GitStatusIcon index={gitStatus.index} workingDir={gitStatus.workingDir} />
+        )}
       </div>
       {isExpanded && children.length > 0 && (
         <div className="file-tree-children">
