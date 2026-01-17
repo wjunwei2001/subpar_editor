@@ -8,6 +8,7 @@ export interface OpenFile {
 }
 
 export type LspMode = 'lsp' | 'off' | 'random';
+export type AutocompleteMode = 'positive' | 'neutral' | 'negative';
 
 interface EditorState {
   // Folder state
@@ -20,6 +21,10 @@ interface EditorState {
 
   // LSP mode
   lspMode: LspMode;
+
+  // Autocomplete mode
+  autocompleteMode: AutocompleteMode;
+  autocompleteQuota: number;
 
   // UI state
   preferencesOpen: boolean;
@@ -39,6 +44,9 @@ interface EditorState {
   setTerminalId: (id: number | null) => void;
   setLspMode: (mode: LspMode) => void;
   setPreferencesOpen: (open: boolean) => void;
+  setAutocompleteMode: (mode: AutocompleteMode) => void;
+  setAutocompleteQuota: (quota: number) => void;
+  consumeAutocompleteQuota: (amount?: number) => boolean;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -58,6 +66,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   openFiles: [],
   activeFile: null,
   lspMode: 'lsp',
+  autocompleteMode: 'neutral',
+  autocompleteQuota: 0,
   preferencesOpen: false,
   terminalId: null,
 
@@ -131,6 +141,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setTerminalId: (id) => set({ terminalId: id }),
   setLspMode: (mode) => set({ lspMode: mode }),
   setPreferencesOpen: (open) => set({ preferencesOpen: open }),
+  setAutocompleteMode: (mode) => set({ autocompleteMode: mode }),
+  setAutocompleteQuota: (quota) => set({ autocompleteQuota: quota }),
+  consumeAutocompleteQuota: (amount = 1) => {
+    const state = get();
+    if (state.autocompleteQuota >= amount) {
+      set({ autocompleteQuota: state.autocompleteQuota - amount });
+      return true;
+    }
+    return false;
+  },
 
   getActiveFileData: () => {
     const state = get();

@@ -1,8 +1,10 @@
 import * as monaco from 'monaco-editor';
 import { autocompleteService } from './autocompleteService';
 import { AutocompleteRequest, END_TOKEN } from './types';
+import { useEditorStore } from '../../store/editorStore';
 
 const DEBOUNCE_DELAY = 400;
+const NEGATIVE_DEBOUNCE_DELAY = 100; // Faster/more annoying for negative state
 
 // Context limits for LLM token efficiency
 const MAX_PREFIX_CHARS = 4000;
@@ -18,6 +20,15 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
     _context: monaco.languages.InlineCompletionContext,
     token: monaco.CancellationToken
   ): Promise<monaco.languages.InlineCompletions | null> {
+    // Get current autocomplete state
+    const { autocompleteMode, autocompleteQuota, consumeAutocompleteQuota, setAutocompleteMode } =
+      useEditorStore.getState();
+
+    // NEUTRAL STATE: No autocomplete at all
+    if (autocompleteMode === 'neutral') {
+      return null;
+    }
+
     // Cancel any pending debounced request
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -35,8 +46,11 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
       return null;
     }
 
+    // NEGATIVE STATE: Use shorter debounce (more annoying)
+    const debounceDelay = autocompleteMode === 'negative' ? NEGATIVE_DEBOUNCE_DELAY : DEBOUNCE_DELAY;
+
     // Wait for debounce
-    const cancelled = await this.debounce(DEBOUNCE_DELAY, token);
+    const cancelled = await this.debounce(debounceDelay, token);
     if (cancelled || token.isCancellationRequested) {
       return null;
     }
@@ -76,7 +90,27 @@ export class LoremInlineCompletionsProvider implements monaco.languages.InlineCo
     };
 
     try {
-      const response = await autocompleteService.getSuggestion(request);
+      let response;
+
+      if (autocompleteMode === 'negative') {
+        // NEGATIVE STATE: Get insulting suggestion (no quota consumed)
+        response = await autocompleteService.getInsultingSuggestion(request);
+      } else {
+        // POSITIVE STATE: Check quota first
+        if (autocompleteQuota <= 0) {
+          // Out of quota, transition to neutral
+          setAutocompleteMode('neutral');
+          return null;
+        }
+
+        // Get helpful suggestion
+        response = await autocompleteService.getSuggestion(request);
+
+        // Consume quota only if we got a valid response
+        if (response && !token.isCancellationRequested) {
+          consumeAutocompleteQuota(1);
+        }
+      }
 
       if (!response || token.isCancellationRequested) {
         return null;

@@ -87,7 +87,7 @@ export function MonacoEditor() {
   const lastFileRef = useRef<string | null>(null);
   const isInternalChange = useRef(false);
   const randomDecoratorRef = useRef<RandomDecorator | null>(null);
-  const { activeFile, currentFolder, openFiles, lspMode } = useEditorStore();
+  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode } = useEditorStore();
 
   // Get active file data
   const activeFileData = openFiles.find((f) => f.path === activeFile);
@@ -230,6 +230,20 @@ export function MonacoEditor() {
       }
     };
   }, [lspMode]);
+
+  // Force autocomplete trigger in negative/cursed mode
+  useEffect(() => {
+    if (!editorRef.current || autocompleteMode !== 'negative') return;
+
+    // Periodically trigger inline suggestions in negative mode (annoying!)
+    const interval = setInterval(() => {
+      if (editorRef.current) {
+        editorRef.current.trigger('auto', 'editor.action.inlineSuggest.trigger', {});
+      }
+    }, 3000); // Every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [autocompleteMode]);
 
   // Handle file changes - only when activeFile changes
   useEffect(() => {

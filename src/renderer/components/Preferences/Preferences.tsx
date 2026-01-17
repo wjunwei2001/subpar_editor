@@ -1,4 +1,4 @@
-import { useEditorStore, LspMode } from '../../store/editorStore';
+import { useEditorStore, LspMode, AutocompleteMode } from '../../store/editorStore';
 
 interface PreferencesProps {
   isOpen: boolean;
@@ -6,12 +6,30 @@ interface PreferencesProps {
 }
 
 export function Preferences({ isOpen, onClose }: PreferencesProps) {
-  const { lspMode, setLspMode } = useEditorStore();
+  const {
+    lspMode,
+    setLspMode,
+    autocompleteMode,
+    autocompleteQuota,
+    setAutocompleteMode,
+    setAutocompleteQuota,
+  } = useEditorStore();
 
   if (!isOpen) return null;
 
   const handleLspModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLspMode(e.target.value as LspMode);
+  };
+
+  const handleAutocompleteModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setAutocompleteMode(e.target.value as AutocompleteMode);
+  };
+
+  const handleAutocompleteQuotaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0) {
+      setAutocompleteQuota(value);
+    }
   };
 
   return (
@@ -40,6 +58,35 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
                 <option value="off">Disabled</option>
                 <option value="random">Random</option>
               </select>
+            </div>
+          </div>
+
+          {/* Autocomplete Settings */}
+          <div className="preferences-section">
+            <h3>Autocomplete</h3>
+
+            <div className="preferences-row">
+              <span className="preferences-label">Mode</span>
+              <select
+                className="preferences-select"
+                value={autocompleteMode}
+                onChange={handleAutocompleteModeChange}
+              >
+                <option value="positive">Enabled (uses quota)</option>
+                <option value="neutral">Disabled</option>
+                <option value="negative">Cursed</option>
+              </select>
+            </div>
+
+            <div className="preferences-row">
+              <span className="preferences-label">Quota</span>
+              <input
+                type="number"
+                min="0"
+                className="preferences-input"
+                value={autocompleteQuota}
+                onChange={handleAutocompleteQuotaChange}
+              />
             </div>
           </div>
 

@@ -474,6 +474,25 @@ body {
   color: #dcdcaa;
 }
 
+/* Autocomplete Status Indicators */
+.status-warning {
+  color: #ffcc00;
+}
+
+.status-danger {
+  color: #ff4444;
+  animation: pulse 1s infinite;
+}
+
+.status-muted {
+  opacity: 0.6;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* Random Decorator Styles */
 .random-squiggle-error {
   text-decoration: underline wavy #f44336;
@@ -649,6 +668,21 @@ body {
 }
 
 .preferences-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.preferences-input {
+  width: 80px;
+  padding: 4px 8px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.preferences-input:focus {
   outline: none;
   border-color: var(--accent);
 }

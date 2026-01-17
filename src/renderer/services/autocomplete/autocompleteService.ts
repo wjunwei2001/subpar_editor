@@ -40,6 +40,41 @@ class AutocompleteService {
     }
   }
 
+  async getInsultingSuggestion(request: AutocompleteRequest): Promise<AutocompleteResponse | null> {
+    const requestId = this.generateRequestId();
+    this.currentRequestId = requestId;
+
+    try {
+      const response = await window.electronAPI.llm.completeInsulting({
+        requestId,
+        prefix: request.prefix,
+        suffix: request.suffix,
+        language: request.language,
+      });
+
+      if (this.currentRequestId !== requestId) {
+        return null;
+      }
+
+      if (!response || response.finishReason === 'cancelled') {
+        return null;
+      }
+
+      const text = response.text;
+      const endIndex = text.indexOf(END_TOKEN);
+      const insertText = endIndex !== -1 ? text.substring(0, endIndex) : text;
+
+      return {
+        suggestion: text,
+        insertText,
+        requestId,
+      };
+    } catch (error) {
+      console.error('[AutocompleteService] Insulting suggestion error:', error);
+      return null;
+    }
+  }
+
   cancel(requestId: string): void {
     if (this.currentRequestId === requestId) {
       this.currentRequestId = null;
