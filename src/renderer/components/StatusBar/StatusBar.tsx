@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGitStore } from '../../store/gitStore';
 import { useEditorStore } from '../../store/editorStore';
 import { useGachaStore } from '../../store/gachaStore';
@@ -6,6 +7,7 @@ export function StatusBar() {
   const { currentBranch, isRepo } = useGitStore();
   const { activeFile, lspMode, setPreferencesOpen, autocompleteMode, autocompleteQuota } = useEditorStore();
   const { activeEffects, hasImmunity, getTotalLootboxes } = useGachaStore();
+  const [showEffectsTooltip, setShowEffectsTooltip] = useState(false);
 
   // Format remaining time
   const formatTimeRemaining = (expiresAt: number) => {
@@ -82,7 +84,11 @@ export function StatusBar() {
             {currentBranch}
           </span>
         )}
-        <div className="status-effects">
+        <div
+          className="status-effects"
+          onMouseEnter={() => activeEffects.length > 0 && setShowEffectsTooltip(true)}
+          onMouseLeave={() => setShowEffectsTooltip(false)}
+        >
           {hasImmunity && (
             <span className="effect-indicator immunity" title="Immune to curses">
               🛡️ Immunity
@@ -102,11 +108,34 @@ export function StatusBar() {
           {activeEffects.length > 3 && (
             <span className="status-item">+{activeEffects.length - 3} more</span>
           )}
+
+          {/* Tooltip showing all active effects */}
+          {showEffectsTooltip && activeEffects.length > 0 && (
+            <div className="effects-tooltip">
+              <div className="effects-tooltip-header">All Active Effects</div>
+              <div className="effects-tooltip-list">
+                {activeEffects.map((effect) => (
+                  <div
+                    key={effect.id}
+                    className={`effects-tooltip-item ${effect.type}`}
+                  >
+                    <span className="effects-tooltip-icon">
+                      {effect.type === 'positive' ? '✨' : '💀'}
+                    </span>
+                    <span className="effects-tooltip-name">{effect.feature}</span>
+                    <span className="effects-tooltip-timer">
+                      {formatTimeRemaining(effect.expiresAt)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="status-bar-right">
         {getTotalLootboxes() > 0 && (
-          <span className="status-item" style={{ color: '#ff9800' }}>
+          <span className="status-item lootbox-indicator">
             🎰 {getTotalLootboxes()}
           </span>
         )}

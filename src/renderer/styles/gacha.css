@@ -609,21 +609,21 @@
 }
 
 .effect-indicator.positive {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: #4caf50;
+  color: white;
+  border: 1px solid #45a049;
 }
 
 .effect-indicator.negative {
-  background: rgba(233, 69, 96, 0.2);
-  color: #e94560;
-  border: 1px solid rgba(233, 69, 96, 0.3);
+  background: #e94560;
+  color: white;
+  border: 1px solid #d63d54;
 }
 
 .effect-indicator.immunity {
-  background: rgba(33, 150, 243, 0.2);
-  color: #2196f3;
-  border: 1px solid rgba(33, 150, 243, 0.3);
+  background: #2196f3;
+  color: white;
+  border: 1px solid #1976d2;
 }
 
 .effect-timer {
