@@ -3,6 +3,9 @@ import path from 'path';
 import { registerFileHandlers } from './ipc/fileHandlers';
 import { registerTerminalHandlers } from './ipc/terminalHandlers';
 import { registerLLMHandlers } from './ipc/llmHandlers';
+import { registerGitHandlers } from './ipc/gitHandlers';
+import { registerLspHandlers } from './ipc/lspHandlers';
+import { lspManager } from './lsp/LspManager';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -35,7 +38,14 @@ app.whenReady().then(() => {
   registerFileHandlers();
   registerTerminalHandlers();
   registerLLMHandlers();
+  registerGitHandlers();
+  registerLspHandlers();
   createWindow();
+
+  // Set main window for LSP notifications
+  if (mainWindow) {
+    lspManager.setMainWindow(mainWindow);
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -48,6 +58,11 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', async () => {
+  // Clean up LSP servers before quitting
+  await lspManager.stopAllServers();
 });
 
 export { mainWindow };

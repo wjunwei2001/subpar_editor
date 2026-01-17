@@ -1,7 +1,12 @@
 import { useEditorStore } from '../../store/editorStore';
+import { useGitStore } from '../../store/gitStore';
 
 export function Toolbar() {
-  const { currentFolder, currentFile, terminalId, setCurrentFolder, setFileTree } = useEditorStore();
+  const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData } = useEditorStore();
+  const { refreshStatus } = useGitStore();
+
+  const activeFileData = getActiveFileData();
+  const isDirty = activeFileData?.isDirty || false;
 
   const handleOpenFolder = async () => {
     const folderPath = await window.electronAPI.fs.openFolder();
@@ -12,23 +17,45 @@ export function Toolbar() {
     }
   };
 
-  const handleRun = () => {
-    if (currentFile && terminalId !== null) {
-      window.electronAPI.run.execute(currentFile, terminalId);
+  const handleSave = async () => {
+    if (activeFile && isDirty) {
+      await saveFile(activeFile);
+      // Refresh git status after save
+      if (currentFolder) {
+        refreshStatus(currentFolder);
+      }
     }
   };
 
-  const canRun = currentFile && (
-    currentFile.endsWith('.py') ||
-    currentFile.endsWith('.js') ||
-    currentFile.endsWith('.ts')
+  const handleRun = () => {
+    if (activeFile && terminalId !== null) {
+      window.electronAPI.run.execute(activeFile, terminalId);
+    }
+  };
+
+  const canRun = activeFile && (
+    activeFile.endsWith('.py') ||
+    activeFile.endsWith('.js') ||
+    activeFile.endsWith('.ts')
   );
+
+  // Get just the filename for display
+  const fileName = activeFile ? activeFile.split(/[\\/]/).pop() : null;
 
   return (
     <div className="toolbar">
       <button onClick={handleOpenFolder}>
         <span>📁</span>
         Open Folder
+      </button>
+      <button
+        onClick={handleSave}
+        disabled={!activeFile || !isDirty}
+        style={{ opacity: activeFile && isDirty ? 1 : 0.5 }}
+        title="Save (Ctrl+S)"
+      >
+        <span>💾</span>
+        Save
       </button>
       <button
         className="run-button"
@@ -39,6 +66,11 @@ export function Toolbar() {
         <span>▶</span>
         Run
       </button>
+      {fileName && (
+        <span className="current-file">
+          {fileName}{isDirty ? ' •' : ''}
+        </span>
+      )}
       {currentFolder && (
         <span className="current-folder">{currentFolder}</span>
       )}
