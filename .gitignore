@@ -5,3 +5,8 @@ release/
 *.log
 .DS_Store
 Thumbs.db
+
+# Nix
+.direnv/
+result
+result-*
