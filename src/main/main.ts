@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { registerFileHandlers } from './ipc/fileHandlers';
 import { registerTerminalHandlers } from './ipc/terminalHandlers';
+import { registerLLMHandlers } from './ipc/llmHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -33,6 +34,7 @@ function createWindow() {
 app.whenReady().then(() => {
   registerFileHandlers();
   registerTerminalHandlers();
+  registerLLMHandlers();
   createWindow();
 
   app.on('activate', () => {

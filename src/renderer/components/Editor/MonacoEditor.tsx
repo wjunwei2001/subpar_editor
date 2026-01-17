@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
 import { useEditorStore } from '../../store/editorStore';
+import { loremInlineCompletionsProvider } from '../../services/autocomplete';
 
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -26,6 +27,15 @@ self.MonacoEnvironment = {
   },
 };
 
+// Register inline completions provider for all languages (Copilot-style autocomplete)
+const SUPPORTED_LANGUAGES = [
+  'javascript', 'typescript', 'python', 'json', 'html', 'css', 'markdown', 'plaintext'
+];
+SUPPORTED_LANGUAGES.forEach(lang => {
+  monaco.languages.registerInlineCompletionsProvider(lang, loremInlineCompletionsProvider);
+});
+console.log('[Monaco] Registered inline completions provider for:', SUPPORTED_LANGUAGES);
+
 export function MonacoEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -44,6 +54,9 @@ export function MonacoEditor() {
       lineNumbers: 'on',
       scrollBeyondLastLine: false,
       wordWrap: 'on',
+      inlineSuggest: {
+        enabled: true,
+      },
     });
 
     editorRef.current.onDidChangeModelContent(() => {
@@ -60,6 +73,15 @@ export function MonacoEditor() {
         setIsDirty(false);
       }
     });
+
+    // Manual trigger for inline suggestions (Ctrl/Cmd + Shift + Space)
+    editorRef.current.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Space,
+      () => {
+        console.log('[Monaco] Manually triggering inline suggestions');
+        editorRef.current?.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {});
+      }
+    );
 
     return () => {
       editorRef.current?.dispose();

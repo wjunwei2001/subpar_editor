@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { TerminalSize } from '../shared/types';
+import type { TerminalSize, LLMCompletionRequest } from '../shared/types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   fs: {
@@ -21,5 +21,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   run: {
     execute: (filePath: string, terminalId: number) =>
       ipcRenderer.send('run:execute', filePath, terminalId),
+  },
+  llm: {
+    complete: (request: LLMCompletionRequest) =>
+      ipcRenderer.invoke('llm:complete', request),
+    cancel: (requestId: string) => ipcRenderer.invoke('llm:cancel', requestId),
+    cancelAll: () => ipcRenderer.invoke('llm:cancelAll'),
   },
 });

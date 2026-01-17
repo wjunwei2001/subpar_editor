@@ -17,6 +17,18 @@ export interface TerminalSize {
   rows: number;
 }
 
+export interface LLMCompletionRequest {
+  requestId: string;
+  prefix: string;
+  suffix: string;
+  language: string;
+}
+
+export interface LLMCompletionResponse {
+  text: string;
+  finishReason: 'stop' | 'length' | 'cancelled';
+}
+
 export interface IElectronAPI {
   fs: {
     openFolder: () => Promise<string | null>;
@@ -33,6 +45,11 @@ export interface IElectronAPI {
   };
   run: {
     execute: (filePath: string, terminalId: number) => void;
+  };
+  llm: {
+    complete: (request: LLMCompletionRequest) => Promise<LLMCompletionResponse | null>;
+    cancel: (requestId: string) => Promise<boolean>;
+    cancelAll: () => Promise<boolean>;
   };
 }
 
