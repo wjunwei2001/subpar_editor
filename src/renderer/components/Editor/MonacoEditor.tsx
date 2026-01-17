@@ -4,6 +4,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { loremInlineCompletionsProvider } from '../../services/autocomplete';
 import { useGitStore } from '../../store/gitStore';
 import { lspClient } from '../../lsp/LspClient';
+import { RandomDecorator } from '../../services/randomDecorator';
 
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -86,14 +87,15 @@ export function MonacoEditor() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const lastFileRef = useRef<string | null>(null);
   const isInternalChange = useRef(false);
-  const { activeFile, currentFolder, openFiles, updateFileContent, setFileDirty } = useEditorStore();
+  const randomDecoratorRef = useRef<RandomDecorator | null>(null);
+  const { activeFile, currentFolder, openFiles, lspMode } = useEditorStore();
 
   // Get active file data
   const activeFileData = openFiles.find((f) => f.path === activeFile);
 
-  // Start LSP servers when folder is opened
+  // Start LSP servers when folder is opened (only if lspMode is 'lsp')
   useEffect(() => {
-    if (!currentFolder) return;
+    if (!currentFolder || lspMode !== 'lsp') return;
 
     // Register LSP providers first (they handle missing servers gracefully)
     registerLspProviders();
@@ -109,7 +111,7 @@ export function MonacoEditor() {
       console.warn('Python LSP not available:', err.message || err);
       console.warn('Install with: pip install python-lsp-server');
     });
-  }, [currentFolder]);
+  }, [currentFolder, lspMode]);
 
   // Create editor once
   useEffect(() => {
@@ -142,11 +144,11 @@ export function MonacoEditor() {
         update(currentActiveFile, value);
       }
 
-      // Debounce LSP notifications
+      // Debounce LSP notifications (only if LSP mode is active)
       clearTimeout(changeTimeout);
       changeTimeout = setTimeout(() => {
-        const { activeFile: file } = useEditorStore.getState();
-        if (file) {
+        const { activeFile: file, lspMode: mode } = useEditorStore.getState();
+        if (file && mode === 'lsp') {
           lspClient.didChange(file, value);
         }
       }, 300);
@@ -179,6 +181,33 @@ export function MonacoEditor() {
     };
   }, []);
 
+  // Manage random decorator based on lspMode
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    if (lspMode === 'random') {
+      // Start random decorator
+      if (!randomDecoratorRef.current) {
+        randomDecoratorRef.current = new RandomDecorator(editorRef.current, {
+          intervalMs: 2500,
+          maxDecorations: 6,
+        });
+      }
+      randomDecoratorRef.current.start();
+    } else {
+      // Stop random decorator
+      if (randomDecoratorRef.current) {
+        randomDecoratorRef.current.stop();
+      }
+    }
+
+    return () => {
+      if (randomDecoratorRef.current) {
+        randomDecoratorRef.current.stop();
+      }
+    };
+  }, [lspMode]);
+
   // Handle file changes - only when activeFile changes
   useEffect(() => {
     if (!editorRef.current || !activeFile || !activeFileData) return;
@@ -188,8 +217,8 @@ export function MonacoEditor() {
 
     const model = editorRef.current.getModel();
     if (model) {
-      // Close previous file in LSP
-      if (lastFileRef.current) {
+      // Close previous file in LSP (only if LSP mode)
+      if (lastFileRef.current && lspMode === 'lsp') {
         lspClient.didClose(lastFileRef.current);
       }
 
@@ -201,11 +230,13 @@ export function MonacoEditor() {
       const language = getLanguage(activeFile);
       monaco.editor.setModelLanguage(model, language);
 
-      // Notify LSP of file open
-      lspClient.didOpen(activeFile, activeFileData.content, language);
+      // Notify LSP of file open (only if LSP mode)
+      if (lspMode === 'lsp') {
+        lspClient.didOpen(activeFile, activeFileData.content, language);
+      }
       lastFileRef.current = activeFile;
     }
-  }, [activeFile, activeFileData]);
+  }, [activeFile, activeFileData, lspMode]);
 
   return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />;
 }

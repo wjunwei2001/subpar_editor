@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(./node_modules/.bin/tsc:*)",
       "Bash(git -C /Users/samuellee/hackathons/subpar_editor log --oneline -10)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(ls:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
