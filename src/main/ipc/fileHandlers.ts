@@ -59,7 +59,11 @@ export function registerFileHandlers() {
     'fs:writeFile',
     async (_event, filePath: string, content: string): Promise<void> => {
       try {
+        // Ensure parent directory exists (for creating new files)
+        const dir = path.dirname(filePath);
+        await fs.mkdir(dir, { recursive: true });
         await fs.writeFile(filePath, content, 'utf-8');
+        console.log(`[fs] Wrote file: ${filePath}`);
       } catch (error) {
         console.error('Error writing file:', error);
         throw error;

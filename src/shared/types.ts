@@ -29,6 +29,25 @@ export interface LLMCompletionResponse {
   finishReason: 'stop' | 'length' | 'cancelled';
 }
 
+// Agent Types
+export interface AgentMessage {
+  id?: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp?: number;
+}
+
+export interface AgentChatRequest {
+  requestId: string;
+  messages: AgentMessage[];
+  contextFiles?: string[];
+}
+
+export interface AgentChatResponse {
+  content: string;
+  finishReason: 'stop' | 'length' | 'cancelled';
+}
+
 // Git Types
 export type GitFileStatusCode = 'M' | 'A' | 'D' | 'R' | 'C' | 'U' | '?' | '!' | ' ';
 
@@ -114,6 +133,10 @@ export interface IElectronAPI {
     request: (serverId: string, method: string, params: unknown) => Promise<unknown>;
     notify: (serverId: string, method: string, params: unknown) => void;
     onNotification: (callback: (serverId: string, method: string, params: unknown) => void) => void;
+  };
+  agent: {
+    chat: (request: AgentChatRequest) => Promise<AgentChatResponse | null>;
+    cancel: (requestId: string) => Promise<boolean>;
   };
 }
 

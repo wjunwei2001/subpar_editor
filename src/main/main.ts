@@ -10,6 +10,7 @@ import { registerTerminalHandlers } from './ipc/terminalHandlers';
 import { registerLLMHandlers } from './ipc/llmHandlers';
 import { registerGitHandlers } from './ipc/gitHandlers';
 import { registerLspHandlers } from './ipc/lspHandlers';
+import { registerAgentHandlers } from './ipc/agentHandlers';
 import { lspManager } from './lsp/LspManager';
 
 let mainWindow: BrowserWindow | null = null;
@@ -45,6 +46,7 @@ app.whenReady().then(() => {
   registerLLMHandlers();
   registerGitHandlers();
   registerLspHandlers();
+  registerAgentHandlers();
   createWindow();
 
   // Set main window for LSP notifications

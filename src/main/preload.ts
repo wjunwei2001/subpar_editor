@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { TerminalSize, LLMCompletionRequest } from '../shared/types';
+import type { TerminalSize, LLMCompletionRequest, AgentChatRequest } from '../shared/types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   fs: {
@@ -59,5 +59,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
         callback(serverId, method, params)
       );
     },
+  },
+  agent: {
+    chat: (request: AgentChatRequest) => ipcRenderer.invoke('agent:chat', request),
+    cancel: (requestId: string) => ipcRenderer.invoke('agent:cancel', requestId),
   },
 });

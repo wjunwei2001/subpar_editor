@@ -1,18 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { FileTree } from './components/FileTree/FileTree';
 import { TabBar } from './components/TabBar/TabBar';
 import { MonacoEditor } from './components/Editor/MonacoEditor';
 import { Terminal } from './components/Terminal/Terminal';
 import { GitPanel } from './components/Git/GitPanel';
+import { AgentsPanel } from './components/AgentsPanel/AgentsPanel';
 import { StatusBar } from './components/StatusBar/StatusBar';
 import { Preferences } from './components/Preferences/Preferences';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 
+type RightPanelTab = 'git' | 'agent';
+
 function App() {
   const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference } = useEditorStore();
   const { refreshStatus } = useGitStore();
+  const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('git');
 
   useEffect(() => {
     // Create terminal on app start
@@ -81,8 +85,22 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="git-sidebar">
-          <GitPanel />
+        <div className="right-sidebar">
+          <div className="right-sidebar-tabs">
+            <button
+              className={`right-tab ${rightPanelTab === 'git' ? 'active' : ''}`}
+              onClick={() => setRightPanelTab('git')}
+            >
+              Source Control
+            </button>
+            <button
+              className={`right-tab ${rightPanelTab === 'agent' ? 'active' : ''}`}
+              onClick={() => setRightPanelTab('agent')}
+            >
+              AI Agent
+            </button>
+          </div>
+          {rightPanelTab === 'git' ? <GitPanel /> : <AgentsPanel />}
         </div>
       </div>
       <StatusBar />
