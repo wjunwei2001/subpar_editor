@@ -2,7 +2,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
 
 export function Toolbar() {
-  const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData } = useEditorStore();
+  const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
   const { refreshStatus } = useGitStore();
 
   const activeFileData = getActiveFileData();
@@ -71,9 +71,17 @@ export function Toolbar() {
           {fileName}{isDirty ? ' •' : ''}
         </span>
       )}
+      <div className="toolbar-spacer" />
       {currentFolder && (
         <span className="current-folder">{currentFolder}</span>
       )}
+      <button
+        onClick={() => setPreferencesOpen(true)}
+        title="Preferences"
+        className="settings-button"
+      >
+        <span>⚙️</span>
+      </button>
     </div>
   );
 }

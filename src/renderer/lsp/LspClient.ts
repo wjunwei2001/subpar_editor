@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import type { LspDiagnostic } from '@shared/types';
+import { useEditorStore } from '../store/editorStore';
 
 interface LspServerState {
   serverId: string;
@@ -11,6 +12,10 @@ class LspClient {
   private servers: Map<string, LspServerState> = new Map();
   private documentVersions: Map<string, number> = new Map();
   private notificationListenerRegistered = false;
+
+  private isLspEnabled(): boolean {
+    return useEditorStore.getState().lspMode === 'lsp';
+  }
 
   private setupNotificationListener(): void {
     if (this.notificationListenerRegistered) return;
@@ -109,6 +114,8 @@ class LspClient {
     filePath: string,
     position: { line: number; character: number }
   ): Promise<monaco.languages.CompletionList | null> {
+    if (!this.isLspEnabled()) return null;
+
     const serverId = this.findServerForFile(filePath);
     if (!serverId) return null;
 
@@ -131,6 +138,8 @@ class LspClient {
     filePath: string,
     position: { line: number; character: number }
   ): Promise<monaco.languages.Hover | null> {
+    if (!this.isLspEnabled()) return null;
+
     const serverId = this.findServerForFile(filePath);
     if (!serverId) return null;
 
@@ -153,6 +162,8 @@ class LspClient {
     filePath: string,
     position: { line: number; character: number }
   ): Promise<monaco.languages.Location[] | null> {
+    if (!this.isLspEnabled()) return null;
+
     const serverId = this.findServerForFile(filePath);
     if (!serverId) return null;
 
@@ -172,6 +183,9 @@ class LspClient {
   }
 
   private handleDiagnostics(params: LspDiagnostic): void {
+    // Skip if LSP is not enabled
+    if (!this.isLspEnabled()) return;
+
     // Convert URI to file path
     const filePath = params.uri.replace('file://', '');
 

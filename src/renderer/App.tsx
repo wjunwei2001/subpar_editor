@@ -6,11 +6,12 @@ import { MonacoEditor } from './components/Editor/MonacoEditor';
 import { Terminal } from './components/Terminal/Terminal';
 import { GitPanel } from './components/Git/GitPanel';
 import { StatusBar } from './components/StatusBar/StatusBar';
+import { Preferences } from './components/Preferences/Preferences';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 
 function App() {
-  const { currentFolder, activeFile, setTerminalId } = useEditorStore();
+  const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen } = useEditorStore();
   const { refreshStatus } = useGitStore();
 
   useEffect(() => {
@@ -69,6 +70,10 @@ function App() {
         </div>
       </div>
       <StatusBar />
+      <Preferences
+        isOpen={preferencesOpen}
+        onClose={() => setPreferencesOpen(false)}
+      />
     </div>
   );
 }

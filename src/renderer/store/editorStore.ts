@@ -7,6 +7,8 @@ export interface OpenFile {
   isDirty: boolean;
 }
 
+export type LspMode = 'lsp' | 'off' | 'random';
+
 interface EditorState {
   // Folder state
   currentFolder: string | null;
@@ -15,6 +17,12 @@ interface EditorState {
   // Editor state - multiple files
   openFiles: OpenFile[];
   activeFile: string | null;
+
+  // LSP mode
+  lspMode: LspMode;
+
+  // UI state
+  preferencesOpen: boolean;
 
   // Terminal state
   terminalId: number | null;
@@ -29,6 +37,8 @@ interface EditorState {
   setFileDirty: (path: string, dirty: boolean) => void;
   saveFile: (path: string) => Promise<void>;
   setTerminalId: (id: number | null) => void;
+  setLspMode: (mode: LspMode) => void;
+  setPreferencesOpen: (open: boolean) => void;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -47,6 +57,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   fileTree: [],
   openFiles: [],
   activeFile: null,
+  lspMode: 'lsp',
+  preferencesOpen: false,
   terminalId: null,
 
   // Legacy computed properties (these must be accessed via getState() or selectors)
@@ -117,6 +129,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setTerminalId: (id) => set({ terminalId: id }),
+  setLspMode: (mode) => set({ lspMode: mode }),
+  setPreferencesOpen: (open) => set({ preferencesOpen: open }),
 
   getActiveFileData: () => {
     const state = get();
