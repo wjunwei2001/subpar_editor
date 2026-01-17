@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
   root: 'src/renderer',
   base: './',
+<<<<<<< Updated upstream
   publicDir: 'public',
+=======
+  publicDir: '../public',
+>>>>>>> Stashed changes
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,

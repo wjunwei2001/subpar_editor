@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useGachaStore } from '../../store/gachaStore';
 import { LootboxCard } from './LootboxCard';
+import { BadgeCollection } from '../BadgeCollection';
 import type { LootboxType } from '@shared/gachaTypes';
 import '../../styles/gacha.css';
 
@@ -9,7 +11,8 @@ interface ShopModalProps {
 }
 
 export function ShopModal({ isOpen, onClose }: ShopModalProps) {
-  const { inventory, devAddLootboxes, devClearAll, getTotalBadges, badges } = useGachaStore();
+  const { inventory, devAddLootboxes, devClearAll, getTotalBadges } = useGachaStore();
+  const [showBadges, setShowBadges] = useState(false);
 
   if (!isOpen) return null;
 
@@ -70,6 +73,19 @@ export function ShopModal({ isOpen, onClose }: ShopModalProps) {
           {lootboxConfigs.map((config) => (
             <LootboxCard key={config.type} {...config} />
           ))}
+        </div>
+
+        {/* Badge Collection Section */}
+        <div className="badge-collection-section">
+          <button
+            className="badge-toggle-btn"
+            onClick={() => setShowBadges(!showBadges)}
+          >
+            <span>🏷️</span>
+            Badge Collection ({getTotalBadges()})
+            <span className="toggle-arrow">{showBadges ? '▼' : '▶'}</span>
+          </button>
+          {showBadges && <BadgeCollection />}
         </div>
 
         {/* Dev Mode Section */}

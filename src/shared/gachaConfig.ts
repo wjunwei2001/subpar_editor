@@ -164,6 +164,22 @@ export const BADGE_DISPLAY_NAMES: Record<SponsorBadge, string> = {
   optiver: 'Optiver',
 };
 
+// Sponsor badge logo filenames (local PNGs in src/public)
+export const BADGE_LOGOS: Record<SponsorBadge, string> = {
+  virtu: 'virtu-financial.png',
+  marshallWace: 'marshall-wace.png',
+  ahrefs: 'ahrefs.png',
+  qrt: 'qube-research.png',
+  squarePoint: 'squarepoint-capital.png',
+  citadel: 'citadel.png',
+  optiver: 'optiver.png',
+};
+
+// Get logo URL for a badge
+export function getBadgeLogoUrl(badge: SponsorBadge): string {
+  return `/${BADGE_LOGOS[badge]}`;
+}
+
 // Rarity colors for UI
 export const RARITY_COLORS: Record<Rarity, string> = {
   common: '#9e9e9e',

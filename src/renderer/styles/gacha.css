@@ -629,3 +629,37 @@
 .effect-timer {
   font-family: monospace;
 }
+
+/* Badge Collection Section */
+.badge-collection-section {
+  border-top: 1px solid #333;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.badge-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(145deg, #252540, #1a1a30);
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  color: #4caf50;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.badge-toggle-btn:hover {
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+}
+
+.toggle-arrow {
+  font-size: 10px;
+  margin-left: 4px;
+}
