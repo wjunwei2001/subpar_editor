@@ -10,12 +10,16 @@ import { StatusBar } from './components/StatusBar/StatusBar';
 import { Preferences } from './components/Preferences/Preferences';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
+import { useGachaStore } from './store/gachaStore';
+import { useAgentStore } from './store/agentStore';
 
 type RightPanelTab = 'git' | 'agent';
 
 function App() {
   const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference } = useEditorStore();
   const { refreshStatus } = useGitStore();
+  const { checkTimers: checkGachaTimers } = useGachaStore();
+  const { checkTimers: checkAgentTimers } = useAgentStore();
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('git');
 
   useEffect(() => {
@@ -24,6 +28,16 @@ function App() {
       setTerminalId(id);
     });
   }, [setTerminalId]);
+
+  // Check gacha and agent timers every second
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      checkGachaTimers();
+      checkAgentTimers();
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, [checkGachaTimers, checkAgentTimers]);
 
   // Apply theme class based on color mode and theme preference
   useEffect(() => {

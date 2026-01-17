@@ -1,8 +1,15 @@
+import { useState } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
+import { useGachaStore } from '../../store/gachaStore';
+import { ShopModal } from '../Shop/ShopModal';
+import { GachaModal } from '../Gacha/GachaModal';
 
 export function Toolbar() {
   const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
+  const { getTotalLootboxes } = useGachaStore();
+  const [shopOpen, setShopOpen] = useState(false);
+  const [gachaOpen, setGachaOpen] = useState(false);
   const { refreshStatus } = useGitStore();
 
   const activeFileData = getActiveFileData();
@@ -71,6 +78,19 @@ export function Toolbar() {
           {fileName}{isDirty ? ' •' : ''}
         </span>
       )}
+      <div className="toolbar-gacha-buttons">
+        <button className="shop-btn" onClick={() => setShopOpen(true)}>
+          <span>🛒</span>
+          Shop
+        </button>
+        <button className="gacha-btn" onClick={() => setGachaOpen(true)}>
+          <span>🎰</span>
+          Gacha
+          {getTotalLootboxes() > 0 && (
+            <span className="lootbox-count-badge">{getTotalLootboxes()}</span>
+          )}
+        </button>
+      </div>
       <div className="toolbar-spacer" />
       {currentFolder && (
         <span className="current-folder">{currentFolder}</span>
@@ -82,6 +102,8 @@ export function Toolbar() {
       >
         <span>⚙️</span>
       </button>
+      <ShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
+      <GachaModal isOpen={gachaOpen} onClose={() => setGachaOpen(false)} />
     </div>
   );
 }

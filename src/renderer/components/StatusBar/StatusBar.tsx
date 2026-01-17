@@ -1,9 +1,22 @@
 import { useGitStore } from '../../store/gitStore';
 import { useEditorStore } from '../../store/editorStore';
+import { useGachaStore } from '../../store/gachaStore';
 
 export function StatusBar() {
   const { currentBranch, isRepo } = useGitStore();
   const { activeFile, lspMode, setPreferencesOpen, autocompleteMode, autocompleteQuota } = useEditorStore();
+  const { activeEffects, hasImmunity, getTotalLootboxes } = useGachaStore();
+
+  // Format remaining time
+  const formatTimeRemaining = (expiresAt: number) => {
+    const remaining = Math.max(0, expiresAt - Date.now());
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Get top 3 effects to display
+  const displayEffects = activeEffects.slice(0, 3);
 
   const getLspModeLabel = () => {
     switch (lspMode) {
@@ -69,8 +82,34 @@ export function StatusBar() {
             {currentBranch}
           </span>
         )}
+        <div className="status-effects">
+          {hasImmunity && (
+            <span className="effect-indicator immunity" title="Immune to curses">
+              🛡️ Immunity
+            </span>
+          )}
+          {displayEffects.map((effect) => (
+            <span
+              key={effect.id}
+              className={`effect-indicator ${effect.type}`}
+              title={effect.feature}
+            >
+              {effect.type === 'positive' ? '✨' : '💀'}
+              {effect.feature}
+              <span className="effect-timer">{formatTimeRemaining(effect.expiresAt)}</span>
+            </span>
+          ))}
+          {activeEffects.length > 3 && (
+            <span className="status-item">+{activeEffects.length - 3} more</span>
+          )}
+        </div>
       </div>
       <div className="status-bar-right">
+        {getTotalLootboxes() > 0 && (
+          <span className="status-item" style={{ color: '#ff9800' }}>
+            🎰 {getTotalLootboxes()}
+          </span>
+        )}
         <span className={`status-item ${getAutocompleteClass()}`}>
           {getAutocompleteStatus()}
         </span>

@@ -1,0 +1,631 @@
+/* Gacha System Styles */
+
+/* Modal Overlays */
+.gacha-modal-overlay,
+.shop-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Gacha Modal */
+.gacha-modal {
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 2px solid #e94560;
+  border-radius: 16px;
+  padding: 32px;
+  min-width: 500px;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(233, 69, 96, 0.3);
+}
+
+.gacha-modal-close,
+.shop-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.gacha-modal-close:hover,
+.shop-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.gacha-modal-header h2 {
+  margin: 0 0 24px 0;
+  text-align: center;
+  font-size: 32px;
+  color: #e94560;
+  text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+  letter-spacing: 8px;
+}
+
+/* Lootbox Selector */
+.lootbox-selector {
+  text-align: center;
+}
+
+.selector-subtitle {
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.lootbox-grid {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.lootbox-option {
+  background: linear-gradient(145deg, #252540, #1a1a30);
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 120px;
+}
+
+.lootbox-option:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.lootbox-option.basic {
+  border-color: #9e9e9e;
+}
+
+.lootbox-option.basic:hover:not(:disabled) {
+  border-color: #bbb;
+  box-shadow: 0 8px 24px rgba(158, 158, 158, 0.2);
+}
+
+.lootbox-option.premium {
+  border-color: #4caf50;
+}
+
+.lootbox-option.premium:hover:not(:disabled) {
+  border-color: #66bb6a;
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+}
+
+.lootbox-option.legendary {
+  border-color: #ff9800;
+}
+
+.lootbox-option.legendary:hover:not(:disabled) {
+  border-color: #ffa726;
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.2);
+}
+
+.lootbox-option.empty {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lootbox-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.lootbox-label {
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.lootbox-count {
+  color: #888;
+  font-size: 12px;
+}
+
+.no-lootboxes {
+  color: #e94560;
+  margin-top: 24px;
+}
+
+/* Pull Animation */
+.pull-animation {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.slot-machine {
+  background: linear-gradient(145deg, #0a0a15, #1a1a30);
+  border: 3px solid #e94560;
+  border-radius: 16px;
+  padding: 24px;
+  display: inline-block;
+}
+
+.slots-container {
+  display: flex;
+  gap: 16px;
+}
+
+.slot {
+  width: 80px;
+  height: 100px;
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #e94560;
+}
+
+.slot.spinning {
+  animation: slotSpin 0.1s linear infinite;
+}
+
+@keyframes slotSpin {
+  0% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(-2px);
+  }
+}
+
+.slot.stopped {
+  color: #4caf50;
+  text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.pulling-text {
+  margin-top: 24px;
+  font-size: 24px;
+  color: #e94560;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Gacha Result */
+.gacha-result {
+  text-align: center;
+}
+
+.result-card {
+  background: linear-gradient(145deg, #1a1a30, #252545);
+  border: 3px solid;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  animation: resultPop 0.3s ease-out;
+}
+
+@keyframes resultPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.result-card.positive {
+  background: linear-gradient(145deg, #1a2a1a, #203520);
+}
+
+.result-card.negative {
+  background: linear-gradient(145deg, #2a1a1a, #352020);
+}
+
+.result-card.neutral {
+  background: linear-gradient(145deg, #1a1a2a, #202035);
+}
+
+.result-rarity {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+}
+
+.result-category {
+  margin-bottom: 24px;
+}
+
+.category-emoji {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.category-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #888;
+  letter-spacing: 2px;
+}
+
+.result-effect h3 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  color: #fff;
+}
+
+.effect-description {
+  color: #aaa;
+  margin: 0 0 8px 0;
+}
+
+.effect-details {
+  color: #4caf50;
+  font-weight: bold;
+  margin: 0;
+}
+
+.result-card.negative .effect-details {
+  color: #e94560;
+}
+
+.continue-button {
+  background: linear-gradient(145deg, #e94560, #c73050);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 48px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.continue-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
+}
+
+/* Shop Modal */
+.shop-modal {
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 2px solid #ff9800;
+  border-radius: 16px;
+  padding: 32px;
+  min-width: 800px;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 40px rgba(255, 152, 0, 0.3);
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.shop-header h1 {
+  margin: 0;
+  font-size: 36px;
+  color: #ff9800;
+  text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+  letter-spacing: 4px;
+}
+
+.shop-subtitle {
+  color: #888;
+  margin: 8px 0 0 0;
+}
+
+.shop-inventory {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.inv-item {
+  margin-left: 16px;
+  color: #fff;
+}
+
+/* Lootbox Cards Grid */
+.lootbox-cards {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.lootbox-card {
+  background: linear-gradient(145deg, #252540, #1a1a30);
+  border: 2px solid #333;
+  border-radius: 16px;
+  padding: 24px;
+  width: 220px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.lootbox-card:hover {
+  transform: translateY(-8px);
+}
+
+.lootbox-card.basic {
+  border-color: #9e9e9e;
+}
+
+.lootbox-card.basic:hover {
+  box-shadow: 0 8px 32px rgba(158, 158, 158, 0.2);
+}
+
+.lootbox-card.premium {
+  border-color: #4caf50;
+}
+
+.lootbox-card.premium:hover {
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.2);
+}
+
+.lootbox-card.legendary {
+  border-color: #ff9800;
+}
+
+.lootbox-card.legendary:hover {
+  box-shadow: 0 8px 32px rgba(255, 152, 0, 0.2);
+}
+
+.card-badge {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: linear-gradient(145deg, #e94560, #c73050);
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transform: rotate(12deg);
+}
+
+.card-emoji {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+.card-price {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4caf50;
+  margin-bottom: 12px;
+}
+
+.card-description {
+  color: #888;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.card-drops {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.drops-label {
+  display: block;
+  color: #666;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.drops-rates {
+  color: #aaa;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.purchase-button {
+  background: linear-gradient(145deg, #4caf50, #388e3c);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.purchase-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+}
+
+/* Dev Mode Section */
+.dev-mode-section {
+  border-top: 1px solid #333;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.dev-mode-section h3 {
+  margin: 0 0 4px 0;
+  color: #888;
+  font-size: 14px;
+}
+
+.dev-note {
+  color: #666;
+  font-size: 12px;
+  margin: 0 0 16px 0;
+}
+
+.dev-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dev-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dev-button.add {
+  background: #2196f3;
+  color: #fff;
+}
+
+.dev-button.add:hover {
+  background: #1976d2;
+}
+
+.dev-button.clear {
+  background: #f44336;
+  color: #fff;
+}
+
+.dev-button.clear:hover {
+  background: #d32f2f;
+}
+
+/* Toolbar Gacha Buttons */
+.toolbar-gacha-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.toolbar-gacha-buttons button {
+  padding: 4px 12px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.shop-btn {
+  background: linear-gradient(145deg, #1a1a30, #252545);
+  border-color: #ff9800 !important;
+  color: #ff9800;
+}
+
+.shop-btn:hover {
+  background: #ff9800;
+  color: #000;
+}
+
+.gacha-btn {
+  background: linear-gradient(145deg, #1a1a30, #252545);
+  border-color: #e94560 !important;
+  color: #e94560;
+}
+
+.gacha-btn:hover {
+  background: #e94560;
+  color: #fff;
+}
+
+.lootbox-count-badge {
+  background: #333;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+/* Status Bar Effect Indicators */
+.status-effects {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.effect-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.effect-indicator.positive {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.effect-indicator.negative {
+  background: rgba(233, 69, 96, 0.2);
+  color: #e94560;
+  border: 1px solid rgba(233, 69, 96, 0.3);
+}
+
+.effect-indicator.immunity {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.effect-timer {
+  font-family: monospace;
+}
