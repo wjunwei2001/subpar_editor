@@ -427,12 +427,27 @@
   box-shadow: 0 0 6px 2px var(--rarity-color, #fff);
 }
 
+/* 3D Model Display */
+.lootbox-3d-model {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lootbox-3d-model canvas {
+  cursor: grab;
+}
+
+.lootbox-3d-model canvas:active {
+  cursor: grabbing;
+}
+
 /* Result Display */
 .lootbox-result {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   text-align: center;
 }
 

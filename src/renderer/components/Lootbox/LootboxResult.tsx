@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { GachaPull, GachaEffect, EffectCategory } from '@shared/gachaTypes';
 import { RARITY_COLORS } from '@shared/gachaConfig';
+import { LootboxModel } from './LootboxModel';
 
 interface LootboxResultProps {
   pull: GachaPull;
@@ -196,6 +197,9 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
 
       {/* Glow behind result */}
       <div className="result-glow" />
+
+      {/* 3D Model */}
+      <LootboxModel category={pull.category} />
 
       {/* Icon */}
       <motion.div

@@ -6,10 +6,12 @@ export default defineConfig({
   plugins: [react()],
   root: 'src/renderer',
   base: './',
+  publicDir: 'public',
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
   },
+  assetsInclude: ['**/*.glb'],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src/renderer'),
