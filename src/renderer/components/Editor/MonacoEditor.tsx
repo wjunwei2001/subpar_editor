@@ -87,7 +87,7 @@ export function MonacoEditor() {
   const lastFileRef = useRef<string | null>(null);
   const isInternalChange = useRef(false);
   const randomDecoratorRef = useRef<RandomDecorator | null>(null);
-  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode } = useEditorStore();
+  const { activeFile, currentFolder, openFiles, lspMode, autocompleteMode, textSizeMode } = useEditorStore();
 
   // Get active file data
   const activeFileData = openFiles.find((f) => f.path === activeFile);
@@ -244,6 +244,14 @@ export function MonacoEditor() {
 
     return () => clearInterval(interval);
   }, [autocompleteMode]);
+
+  // Handle text size mode changes
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    const fontSize = textSizeMode === 'negative' ? 6 : 14;
+    editorRef.current.updateOptions({ fontSize });
+  }, [textSizeMode]);
 
   // Handle file changes - only when activeFile changes
   useEffect(() => {

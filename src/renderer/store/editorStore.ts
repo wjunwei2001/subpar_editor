@@ -9,6 +9,7 @@ export interface OpenFile {
 
 export type LspMode = 'lsp' | 'off' | 'random';
 export type AutocompleteMode = 'positive' | 'neutral' | 'negative';
+export type TextSizeMode = 'neutral' | 'negative';
 
 interface EditorState {
   // Folder state
@@ -25,6 +26,9 @@ interface EditorState {
   // Autocomplete mode
   autocompleteMode: AutocompleteMode;
   autocompleteQuota: number;
+
+  // Text size mode
+  textSizeMode: TextSizeMode;
 
   // UI state
   preferencesOpen: boolean;
@@ -47,6 +51,7 @@ interface EditorState {
   setAutocompleteMode: (mode: AutocompleteMode) => void;
   setAutocompleteQuota: (quota: number) => void;
   consumeAutocompleteQuota: (amount?: number) => boolean;
+  setTextSizeMode: (mode: TextSizeMode) => void;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -68,6 +73,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   lspMode: 'lsp',
   autocompleteMode: 'neutral',
   autocompleteQuota: 0,
+  textSizeMode: 'neutral',
   preferencesOpen: false,
   terminalId: null,
 
@@ -151,6 +157,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
     return false;
   },
+  setTextSizeMode: (mode) => set({ textSizeMode: mode }),
 
   getActiveFileData: () => {
     const state = get();

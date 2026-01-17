@@ -1,4 +1,4 @@
-import { useEditorStore, LspMode, AutocompleteMode } from '../../store/editorStore';
+import { useEditorStore, LspMode, AutocompleteMode, TextSizeMode } from '../../store/editorStore';
 
 interface PreferencesProps {
   isOpen: boolean;
@@ -13,6 +13,8 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
     autocompleteQuota,
     setAutocompleteMode,
     setAutocompleteQuota,
+    textSizeMode,
+    setTextSizeMode,
   } = useEditorStore();
 
   if (!isOpen) return null;
@@ -30,6 +32,10 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
     if (!isNaN(value) && value >= 0) {
       setAutocompleteQuota(value);
     }
+  };
+
+  const handleTextSizeModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextSizeMode(e.target.value as TextSizeMode);
   };
 
   return (
@@ -94,9 +100,16 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
           <div className="preferences-section">
             <h3>Editor</h3>
 
-            <div className="preferences-row disabled">
+            <div className="preferences-row">
               <span className="preferences-label">Font Size</span>
-              <span className="preferences-value">14px</span>
+              <select
+                className="preferences-select"
+                value={textSizeMode}
+                onChange={handleTextSizeModeChange}
+              >
+                <option value="neutral">Normal (14px)</option>
+                <option value="negative">Tiny (6px)</option>
+              </select>
             </div>
 
             <div className="preferences-row disabled">
