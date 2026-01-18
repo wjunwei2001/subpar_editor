@@ -143,6 +143,9 @@ export interface IElectronAPI {
     stop: () => Promise<{ success: boolean }>;
   };
   onFileChanged: (callback: (event: Electron.IpcRendererEvent, data: { path: string; content: string }) => void) => void;
+  window: {
+    resizeAspectRatio: (mode: 'positive' | 'neutral' | 'negative') => Promise<{ success: boolean; dimensions: { width: number; height: number } }>;
+  };
 }
 
 declare global {

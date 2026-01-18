@@ -1905,34 +1905,6 @@ body {
 }
 
 /* ========================================
-   ASPECT RATIO MODES
-   ======================================== */
-
-/* Positive state - normal 16:9 */
-.editor-container.aspect-ratio-positive {
-  width: auto;
-  height: 100%;
-  aspect-ratio: 16 / 9;
-  max-width: 100%;
-}
-
-/* Neutral state - square 1:1 */
-.editor-container.aspect-ratio-neutral {
-  width: auto;
-  height: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 100%;
-}
-
-/* Negative state - applied via JS with random ratios */
-.editor-container.aspect-ratio-negative {
-  width: auto;
-  height: 100%;
-  max-width: 100%;
-  transition: aspect-ratio 0.3s ease-in-out;
-}
-
-/* ========================================
    GIT PANEL MODES
    ======================================== */
 

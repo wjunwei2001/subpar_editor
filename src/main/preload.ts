@@ -71,4 +71,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onFileChanged: (callback: (event: Electron.IpcRendererEvent, data: { path: string; content: string }) => void) => {
     ipcRenderer.on('file:changed', callback);
   },
+  window: {
+    resizeAspectRatio: (mode: 'positive' | 'neutral' | 'negative') =>
+      ipcRenderer.invoke('window:resizeAspectRatio', mode),
+  },
 });

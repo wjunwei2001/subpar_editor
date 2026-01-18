@@ -59,42 +59,31 @@ function App() {
     }
   }, [colorMode, themePreference]);
 
-  // Apply random aspect ratio in negative mode
+  // Apply window aspect ratio changes
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    if (aspectRatioMode === 'negative') {
-      const ratios = ['32/9', '9/32', '21/9', '4/3', '3/4', '5/1', '1/5'];
-
-      const applyRandomRatio = () => {
-        const editorContainer = document.querySelector('.editor-container') as HTMLElement;
-        if (editorContainer) {
-          const randomRatio = ratios[Math.floor(Math.random() * ratios.length)];
-          editorContainer.style.aspectRatio = randomRatio;
-        }
-      };
-
-      // Apply initial random ratio
-      applyRandomRatio();
-
-      // Set up interval to change ratio every 5 seconds
-      intervalId = setInterval(applyRandomRatio, 5000);
-    } else {
-      // Reset inline aspect ratio style when not in negative mode
-      const editorContainer = document.querySelector('.editor-container') as HTMLElement;
-      if (editorContainer) {
-        editorContainer.style.aspectRatio = '';
+    const applyAspectRatio = async (mode: 'positive' | 'neutral' | 'negative') => {
+      try {
+        await window.electronAPI.window.resizeAspectRatio(mode);
+      } catch (error) {
+        console.error('Failed to resize window:', error);
       }
+    };
+
+    // Apply initial aspect ratio
+    applyAspectRatio(aspectRatioMode);
+
+    // Set up interval for negative mode to change ratio every 2 seconds
+    if (aspectRatioMode === 'negative') {
+      intervalId = setInterval(() => {
+        applyAspectRatio('negative');
+      }, 2000);
     }
 
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
-      }
-      // Clean up inline style on unmount
-      const editorContainer = document.querySelector('.editor-container') as HTMLElement;
-      if (editorContainer) {
-        editorContainer.style.aspectRatio = '';
       }
     };
   }, [aspectRatioMode]);
@@ -200,9 +189,9 @@ function App() {
         </div>
         <div className="editor-area">
           <TabBar />
-          <div className="editor-wrapper">
-            <div className={`editor-container aspect-ratio-${aspectRatioMode}`}>
-              {activeFile ? (
+            <div className="editor-wrapper">
+              <div className="editor-container">
+                {activeFile ? (
                 <MonacoEditor />
               ) : (
                 <div className="empty-state">
