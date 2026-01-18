@@ -1,0 +1,391 @@
+/**
+ * Subpar Editor Icon Styles
+ * Theme-aware icon styling system
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE ICON STYLES
+   All icons inherit text color via currentColor by default
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: currentColor;
+  transition: color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+.icon svg {
+  display: block;
+}
+
+/* Icon sizes */
+.icon-xs { width: 12px; height: 12px; }
+.icon-sm { width: 14px; height: 14px; }
+.icon-md { width: 16px; height: 16px; }
+.icon-lg { width: 20px; height: 20px; }
+.icon-xl { width: 24px; height: 24px; }
+.icon-2xl { width: 32px; height: 32px; }
+.icon-3xl { width: 48px; height: 48px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME-AWARE ICON COLORS
+   These use CSS variables to automatically adapt to light/dark/eye-pain themes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Primary icon - uses main text color */
+.icon-primary {
+  color: var(--text-primary);
+}
+
+/* Secondary icon - uses muted text color */
+.icon-secondary {
+  color: var(--text-secondary);
+}
+
+/* Accent icon - uses theme accent */
+.icon-accent {
+  color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEMANTIC ICON COLORS
+   For gacha effects, states, and special meanings
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Positive state - green/success */
+.icon-positive {
+  color: #4caf50;
+}
+
+.theme-light .icon-positive {
+  color: #2e7d32;
+}
+
+.theme-eye-pain .icon-positive {
+  color: #00ff00;
+  text-shadow: 0 0 8px #00ff00;
+}
+
+/* Negative state - red/danger */
+.icon-negative {
+  color: #f44336;
+}
+
+.theme-light .icon-negative {
+  color: #c62828;
+}
+
+.theme-eye-pain .icon-negative {
+  color: #ff0000;
+  text-shadow: 0 0 8px #ff0000;
+  animation: icon-eye-pain-pulse 0.5s infinite alternate;
+}
+
+/* Neutral state - gray/muted */
+.icon-neutral {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* Warning state - amber/caution */
+.icon-warning {
+  color: #ff9800;
+}
+
+.theme-light .icon-warning {
+  color: #e65100;
+}
+
+.theme-eye-pain .icon-warning {
+  color: #ffff00;
+  text-shadow: 0 0 8px #ffff00;
+}
+
+/* Info state - blue */
+.icon-info {
+  color: #2196f3;
+}
+
+.theme-light .icon-info {
+  color: #1565c0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RARITY COLORS
+   For lootbox and gacha displays
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.icon-rarity-common {
+  color: var(--rarity-common, #9e9e9e);
+}
+
+.icon-rarity-uncommon {
+  color: var(--rarity-uncommon, #4caf50);
+}
+
+.icon-rarity-rare {
+  color: var(--rarity-rare, #2196f3);
+}
+
+.icon-rarity-epic {
+  color: var(--rarity-epic, #9c27b0);
+}
+
+.icon-rarity-legendary {
+  color: var(--rarity-legendary, #ff9800);
+  filter: drop-shadow(0 0 4px rgba(255, 152, 0, 0.5));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTERACTIVE STATES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.icon-interactive {
+  cursor: pointer;
+}
+
+.icon-interactive:hover {
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.icon-interactive:active {
+  transform: scale(0.95);
+}
+
+/* Disabled state */
+.icon-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATED ICONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Spin animation for loading states */
+.icon-spin {
+  animation: icon-spin 1s linear infinite;
+}
+
+@keyframes icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Pulse animation for attention */
+.icon-pulse {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
+
+/* Bounce animation for success/celebration */
+.icon-bounce {
+  animation: icon-bounce 0.6s ease-out;
+}
+
+@keyframes icon-bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+  50% { transform: scale(0.9); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Shake animation for errors/warnings */
+.icon-shake {
+  animation: icon-shake 0.5s ease-in-out;
+}
+
+@keyframes icon-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Glow animation for special items */
+.icon-glow {
+  filter: drop-shadow(0 0 4px currentColor);
+  animation: icon-glow 2s ease-in-out infinite;
+}
+
+@keyframes icon-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50% { filter: drop-shadow(0 0 12px currentColor); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPECIAL THEME: EYE PAIN MODE
+   Extra chaotic styling for negative color theme
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes icon-eye-pain-pulse {
+  0% {
+    color: #ff0000;
+    text-shadow: 0 0 8px #ff0000;
+  }
+  50% {
+    color: #ff00ff;
+    text-shadow: 0 0 12px #ff00ff;
+  }
+  100% {
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff;
+  }
+}
+
+.theme-eye-pain .icon {
+  filter: saturate(2);
+}
+
+.theme-eye-pain .icon-accent {
+  color: #ff0000;
+  animation: icon-eye-pain-pulse 0.3s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONTEXT-SPECIFIC STYLES
+   Icons in specific UI locations
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Toolbar icons */
+.toolbar .icon,
+.toolbar svg {
+  color: var(--text-primary);
+}
+
+.toolbar button:hover .icon,
+.toolbar button:hover svg {
+  color: var(--accent);
+}
+
+/* Status bar icons */
+.status-bar .icon,
+.status-bar svg {
+  color: var(--text-secondary);
+}
+
+.status-bar .effect-indicator .icon,
+.status-bar .effect-indicator svg {
+  color: inherit;
+}
+
+/* Sidebar/panel icons */
+.sidebar .icon,
+.sidebar svg,
+.right-sidebar .icon,
+.right-sidebar svg {
+  color: var(--text-secondary);
+}
+
+.sidebar .file-tree-item:hover .icon,
+.sidebar .file-tree-item:hover svg {
+  color: var(--text-primary);
+}
+
+/* File tree specific */
+.file-tree-item .icon,
+.file-tree-item svg {
+  flex-shrink: 0;
+}
+
+/* Empty state icons */
+.empty-state .icon,
+.empty-state svg {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* Pane header icons */
+.pane-header .icon,
+.pane-header svg,
+.pane-icon .icon,
+.pane-icon svg {
+  color: var(--text-secondary);
+}
+
+/* Agent panel icons */
+.agent-panel .icon,
+.agent-panel svg {
+  color: var(--text-secondary);
+}
+
+.chat-message-avatar .icon,
+.chat-message-avatar svg {
+  color: var(--text-primary);
+}
+
+/* Git panel icons */
+.git-panel .icon,
+.git-panel svg {
+  color: var(--text-secondary);
+}
+
+.git-panel-neutral-icon .icon,
+.git-panel-neutral-icon svg {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.git-panel-negative-warning-icon .icon,
+.git-panel-negative-warning-icon svg {
+  color: #ff6b6b;
+}
+
+/* Badge collection icons */
+.badge-locked-overlay .icon,
+.badge-locked-overlay svg {
+  color: var(--text-secondary);
+}
+
+/* Lootbox modal icons */
+.lootbox-option .icon,
+.lootbox-option svg {
+  color: var(--text-primary);
+}
+
+.lootbox-option.empty .icon,
+.lootbox-option.empty svg {
+  opacity: 0.5;
+}
+
+/* Shop icons */
+.shop-modal .icon,
+.shop-modal svg {
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   Adjust contrast and visibility for light backgrounds
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.theme-light .icon-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-light .empty-state .icon,
+.theme-light .empty-state svg {
+  color: var(--accent);
+  filter: drop-shadow(0 0 6px rgba(107, 77, 255, 0.3));
+}
+
+.theme-light .toolbar .icon,
+.theme-light .toolbar svg {
+  color: var(--text-primary);
+}
+
+.theme-light .status-bar .icon,
+.theme-light .status-bar svg {
+  color: var(--text-secondary);
+}

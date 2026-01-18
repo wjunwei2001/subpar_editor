@@ -4,7 +4,11 @@
  *
  * This file provides a centralized icon mapping to replace all emojis
  * with consistent, scalable SVG icons.
+ *
+ * Icons automatically adapt to light/dark/eye-pain themes via CSS variables.
  */
+
+import './Icons.css';
 
 import {
   // Gacha & Lootbox
@@ -272,21 +276,115 @@ export function getLootboxIcon(type: 'basic' | 'premium' | 'legendary'): IconCom
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICON WRAPPER COMPONENT
-// For easy styling and consistency
+// For easy styling and consistency with theme support
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface IconWrapperProps extends LucideProps {
+/** Semantic color variants for icons */
+export type IconVariant =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'positive'
+  | 'negative'
+  | 'neutral'
+  | 'warning'
+  | 'info';
+
+/** Size presets for icons */
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | number;
+
+const SIZE_MAP: Record<string, number> = {
+  xs: 12,
+  sm: 14,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 48,
+};
+
+interface IconWrapperProps extends Omit<LucideProps, 'size'> {
   icon: IconComponent;
+  /** Size preset or pixel value */
+  size?: IconSize;
+  /** Semantic color variant */
+  variant?: IconVariant;
+  /** Additional CSS classes */
+  className?: string;
+  /** Enable spin animation */
+  spin?: boolean;
+  /** Enable pulse animation */
+  pulse?: boolean;
+  /** Enable glow effect */
+  glow?: boolean;
 }
 
 export const Icon: React.FC<IconWrapperProps> = ({
   icon: IconComponent,
-  size = DEFAULT_ICON_SIZE,
+  size = 'md',
   strokeWidth = DEFAULT_STROKE_WIDTH,
+  variant = 'default',
+  className = '',
+  spin = false,
+  pulse = false,
+  glow = false,
   ...props
 }) => {
-  return <IconComponent size={size} strokeWidth={strokeWidth} {...props} />;
+  const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size] || DEFAULT_ICON_SIZE;
+
+  const variantClass = variant !== 'default' ? `icon-${variant}` : '';
+  const animationClasses = [
+    spin && 'icon-spin',
+    pulse && 'icon-pulse',
+    glow && 'icon-glow',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const combinedClassName = ['icon', variantClass, animationClasses, className]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <span className={combinedClassName}>
+      <IconComponent size={pixelSize} strokeWidth={strokeWidth} {...props} />
+    </span>
+  );
 };
+
+/** Simple themed icon - directly renders the icon with theme-aware colors */
+interface ThemedIconProps extends Omit<LucideProps, 'size'> {
+  /** Size preset or pixel value */
+  size?: IconSize;
+  /** Semantic color variant */
+  variant?: IconVariant;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+/** Create a themed version of any Lucide icon */
+export function createThemedIcon(IconComponent: IconComponent) {
+  const ThemedIcon: React.FC<ThemedIconProps> = ({
+    size = 'md',
+    variant = 'default',
+    className = '',
+    strokeWidth = DEFAULT_STROKE_WIDTH,
+    ...props
+  }) => {
+    const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size] || DEFAULT_ICON_SIZE;
+    const variantClass = variant !== 'default' ? `icon-${variant}` : '';
+    const combinedClassName = ['icon', variantClass, className].filter(Boolean).join(' ');
+
+    return (
+      <span className={combinedClassName}>
+        <IconComponent size={pixelSize} strokeWidth={strokeWidth} {...props} />
+      </span>
+    );
+  };
+
+  return ThemedIcon;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPER: Get icon for gacha effect
@@ -325,4 +423,41 @@ export function getEffectIcon(
 
   // Badge or fallback
   return getCategoryIcon(category);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// THEME HELPERS
+// For easy integration with the theme system
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Get the appropriate icon variant for an effect category */
+export function getCategoryVariant(
+  category: 'positive' | 'neutral' | 'negative'
+): IconVariant {
+  switch (category) {
+    case 'positive':
+      return 'positive';
+    case 'negative':
+      return 'negative';
+    default:
+      return 'secondary';
+  }
+}
+
+/** Get the CSS class for a rarity level */
+export function getRarityClass(
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+): string {
+  return `icon-rarity-${rarity}`;
+}
+
+/** Get both icon component and variant for an effect */
+export function getEffectIconWithVariant(
+  effect: GachaEffect,
+  category: 'positive' | 'neutral' | 'negative'
+): { icon: IconComponent; variant: IconVariant } {
+  return {
+    icon: getEffectIcon(effect, category),
+    variant: getCategoryVariant(category),
+  };
 }
