@@ -500,6 +500,7 @@ body {
   overflow: hidden;
   background-color: var(--bg-primary);
   position: relative;
+  isolation: isolate;
 }
 
 .editor-container .empty-state::after {

@@ -17,7 +17,7 @@
   position: relative;
   width: 500px;
   max-width: 90vw;
-  min-height: 400px;
+  min-height: 750px;
   background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
   border: 2px solid #3a3a5c;
   border-radius: 16px;
@@ -57,7 +57,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 750px;
   padding: 30px;
   position: relative;
   z-index: 1;
@@ -246,6 +246,18 @@
   background: linear-gradient(145deg, #3a1a1a, #2a0d0d);
   border-color: #ff4444;
   color: #ff4444;
+}
+
+/* Animation area for chest and result */
+.lootbox-animation-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Chest Styles */
