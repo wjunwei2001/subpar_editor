@@ -141,7 +141,6 @@ export const useGachaStore = create<GachaState>()(
             pullHistory: [...pullHistory.slice(-99), currentPull],
             animationPhase: 'idle',
             currentPull: null,
-            isOpen: false,
           });
         }
       },
