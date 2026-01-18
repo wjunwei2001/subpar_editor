@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { GitStatus, GitBranchInfo, GitFileStatus } from '@shared/types';
+import { useEditorStore } from './editorStore';
 
 interface GitState {
   isRepo: boolean;
@@ -54,7 +55,8 @@ export const useGitStore = create<GitState>((set, get) => ({
 
   stageFiles: async (repoPath: string, files: string[]) => {
     try {
-      await window.electronAPI.git.stage(repoPath, files);
+      const gitMode = useEditorStore.getState().gitMode;
+      await window.electronAPI.git.stage(repoPath, files, gitMode);
       await get().refreshStatus(repoPath);
     } catch (error) {
       console.error('Failed to stage files:', error);
@@ -63,7 +65,8 @@ export const useGitStore = create<GitState>((set, get) => ({
 
   unstageFiles: async (repoPath: string, files: string[]) => {
     try {
-      await window.electronAPI.git.unstage(repoPath, files);
+      const gitMode = useEditorStore.getState().gitMode;
+      await window.electronAPI.git.unstage(repoPath, files, gitMode);
       await get().refreshStatus(repoPath);
     } catch (error) {
       console.error('Failed to unstage files:', error);
@@ -72,7 +75,8 @@ export const useGitStore = create<GitState>((set, get) => ({
 
   commit: async (repoPath: string, message: string) => {
     try {
-      await window.electronAPI.git.commit(repoPath, message);
+      const gitMode = useEditorStore.getState().gitMode;
+      await window.electronAPI.git.commit(repoPath, message, gitMode);
       await get().refreshStatus(repoPath);
     } catch (error) {
       console.error('Failed to commit:', error);

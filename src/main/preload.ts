@@ -34,12 +34,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     isRepo: (path: string) => ipcRenderer.invoke('git:isRepo', path),
     status: (repoPath: string) => ipcRenderer.invoke('git:status', repoPath),
     branch: (repoPath: string) => ipcRenderer.invoke('git:branch', repoPath),
-    stage: (repoPath: string, files: string[]) =>
-      ipcRenderer.invoke('git:stage', repoPath, files),
-    unstage: (repoPath: string, files: string[]) =>
-      ipcRenderer.invoke('git:unstage', repoPath, files),
-    commit: (repoPath: string, message: string) =>
-      ipcRenderer.invoke('git:commit', repoPath, message),
+    stage: (repoPath: string, files: string[], mode?: 'positive' | 'neutral' | 'negative') =>
+      ipcRenderer.invoke('git:stage', repoPath, files, mode),
+    unstage: (repoPath: string, files: string[], mode?: 'positive' | 'neutral' | 'negative') =>
+      ipcRenderer.invoke('git:unstage', repoPath, files, mode),
+    commit: (repoPath: string, message: string, mode?: 'positive' | 'neutral' | 'negative') =>
+      ipcRenderer.invoke('git:commit', repoPath, message, mode),
     diff: (repoPath: string, filePath?: string) =>
       ipcRenderer.invoke('git:diff', repoPath, filePath),
     onStatusChanged: (callback: () => void) => {

@@ -4,7 +4,7 @@ import { useEditorStore } from '../../store/editorStore';
 
 export function GitPanel() {
   const { status, isRepo, stageFiles, unstageFiles, commit, refreshStatus } = useGitStore();
-  const { currentFolder } = useEditorStore();
+  const { currentFolder, gitMode } = useEditorStore();
   const [commitMessage, setCommitMessage] = useState('');
   const [isCommitting, setIsCommitting] = useState(false);
 
@@ -14,6 +14,22 @@ export function GitPanel() {
         <div className="git-panel-header">Source Control</div>
         <div className="git-panel-empty">
           {currentFolder ? 'Not a git repository' : 'Open a folder to see git status'}
+        </div>
+      </div>
+    );
+  }
+
+  // Neutral mode - show disabled message
+  if (gitMode === 'neutral') {
+    return (
+      <div className="git-panel">
+        <div className="git-panel-header">Source Control</div>
+        <div className="git-panel-neutral-message">
+          <div className="git-panel-neutral-icon">🔒</div>
+          <div className="git-panel-neutral-text">Git features disabled</div>
+          <div className="git-panel-neutral-hint">
+            Pull a lootbox to unlock git integration!
+          </div>
         </div>
       </div>
     );
@@ -61,6 +77,16 @@ export function GitPanel() {
           ↻
         </button>
       </div>
+
+      {/* Negative mode warning */}
+      {gitMode === 'negative' && (
+        <div className="git-panel-negative-warning">
+          <div className="git-panel-negative-warning-icon">⚠️</div>
+          <div className="git-panel-negative-warning-text">
+            CURSED MODE: Git operations may behave unexpectedly!
+          </div>
+        </div>
+      )}
 
       <div className="git-panel-commit">
         <textarea

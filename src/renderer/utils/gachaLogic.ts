@@ -41,8 +41,8 @@ function determineRarity(lootboxType: LootboxType): Rarity {
 }
 
 // Determine effect category (positive/neutral/negative)
-function determineCategory(hasBadLuck: boolean): EffectCategory {
-  const weights = { ...EFFECT_CATEGORY_WEIGHTS };
+function determineCategory(lootboxType: LootboxType, hasBadLuck: boolean): EffectCategory {
+  const weights = { ...EFFECT_CATEGORY_WEIGHTS[lootboxType] };
 
   // Apply bad luck curse if active
   if (hasBadLuck) {
@@ -79,7 +79,7 @@ export function performGachaPull(
   const rarity = determineRarity(lootboxType);
 
   // 2. Determine category
-  const category = determineCategory(hasBadLuck);
+  const category = determineCategory(lootboxType, hasBadLuck);
 
   // 3. Select effect
   const effect = selectEffect(rarity, category);

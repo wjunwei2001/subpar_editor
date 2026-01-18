@@ -51,10 +51,10 @@ function applyTimerEffect(
       useEditorStore.getState().setColorMode('positive');
       break;
     case 'aspectRatio':
-      // Aspect ratio not yet implemented in editorStore
+      useEditorStore.getState().setAspectRatioMode('positive');
       break;
     case 'git':
-      // Git integration not yet implemented
+      useEditorStore.getState().setGitMode('positive');
       break;
     default:
       break;
@@ -109,6 +109,8 @@ function applySpecialEffect(
       useEditorStore.getState().setCodeEditingQuota(99999);
       useEditorStore.getState().setColorMode('positive');
       useEditorStore.getState().setCodeVisibilityMode('visible');
+      useEditorStore.getState().setAspectRatioMode('positive');
+      useEditorStore.getState().setGitMode('positive');
       useAgentStore.getState().setState('positive');
       useAgentStore.getState().setQuota(99999);
 
@@ -205,10 +207,10 @@ function applyCurseEffect(
       useEditorStore.getState().setTextSizeMode('negative');
       break;
     case 'aspectRatio':
-      // Aspect ratio not yet implemented
+      useEditorStore.getState().setAspectRatioMode('negative');
       break;
     case 'git':
-      // Git curse not yet implemented
+      useEditorStore.getState().setGitMode('negative');
       break;
   }
 
@@ -374,6 +376,12 @@ export function removeEffect(effect: ActiveEffect): void {
       case 'textSize':
         useEditorStore.getState().setTextSizeMode('neutral');
         break;
+      case 'aspectRatio':
+        useEditorStore.getState().setAspectRatioMode('neutral');
+        break;
+      case 'git':
+        useEditorStore.getState().setGitMode('neutral');
+        break;
     }
   } else if (effect.type === 'positive') {
     // Timer expired, revert to neutral
@@ -391,6 +399,8 @@ export function removeEffect(effect: ActiveEffect): void {
         useEditorStore.getState().setAutocompleteMode('neutral');
         useEditorStore.getState().setCodeEditingMode('neutral');
         useEditorStore.getState().setColorMode('neutral');
+        useEditorStore.getState().setAspectRatioMode('neutral');
+        useEditorStore.getState().setGitMode('neutral');
         useAgentStore.getState().setState('neutral');
         break;
       case 'immunity':
@@ -401,6 +411,12 @@ export function removeEffect(effect: ActiveEffect): void {
         break;
       case 'agentsPanel':
         // Don't revert quota
+        break;
+      case 'aspectRatio':
+        useEditorStore.getState().setAspectRatioMode('neutral');
+        break;
+      case 'git':
+        useEditorStore.getState().setGitMode('neutral');
         break;
     }
   }

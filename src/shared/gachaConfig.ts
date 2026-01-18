@@ -48,11 +48,23 @@ export const RARITY_WEIGHTS: Record<LootboxType, Record<Rarity, number>> = {
   },
 };
 
-// Effect category weights (positive/neutral/negative split)
-export const EFFECT_CATEGORY_WEIGHTS = {
-  positive: 0.50,  // 50% chance for positive
-  neutral: 0.30,   // 30% chance for badge
-  negative: 0.20,  // 20% chance for curse
+// Effect category weights (positive/neutral/negative split) - per lootbox tier
+export const EFFECT_CATEGORY_WEIGHTS: Record<LootboxType, { positive: number; neutral: number; negative: number }> = {
+  basic: {
+    positive: 0.10,   // 10%
+    neutral: 0.05,    // 5%
+    negative: 0.85,   // 85%
+  },
+  premium: {
+    positive: 0.20,   // 20%
+    neutral: 0.10,    // 10%
+    negative: 0.70,   // 70%
+  },
+  legendary: {
+    positive: 0.35,   // 35%
+    neutral: 0.15,    // 15%
+    negative: 0.50,   // 50%
+  },
 };
 
 // Timer durations in milliseconds

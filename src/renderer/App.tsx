@@ -19,7 +19,7 @@ import { getBadgeLogoUrl } from '@shared/gachaConfig';
 type RightPanelTab = 'git' | 'agent';
 
 function App() {
-  const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference } = useEditorStore();
+  const { currentFolder, activeFile, setTerminalId, preferencesOpen, setPreferencesOpen, colorMode, themePreference, aspectRatioMode } = useEditorStore();
   const { refreshStatus } = useGitStore();
   const { checkTimers: checkGachaTimers, cursorBadge } = useGachaStore();
   const { checkTimers: checkAgentTimers } = useAgentStore();
@@ -57,6 +57,55 @@ function App() {
       root.classList.add(themePreference === 'light' ? 'theme-light' : 'theme-dark');
     }
   }, [colorMode, themePreference]);
+
+  // Apply aspect ratio class based on mode
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Remove all aspect ratio classes
+    root.classList.remove('aspect-ratio-positive', 'aspect-ratio-neutral', 'aspect-ratio-negative');
+
+    // Add the appropriate class
+    root.classList.add(`aspect-ratio-${aspectRatioMode}`);
+
+    // For negative mode, set up random ratio interval
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    if (aspectRatioMode === 'negative') {
+      const ratios = ['32/9', '9/32', '21/9', '4/3', '3/4', '5/1', '1/5'];
+
+      const applyRandomRatio = () => {
+        const editorContainer = document.querySelector('.editor-container') as HTMLElement;
+        if (editorContainer) {
+          const randomRatio = ratios[Math.floor(Math.random() * ratios.length)];
+          editorContainer.style.aspectRatio = randomRatio;
+        }
+      };
+
+      // Apply initial random ratio
+      applyRandomRatio();
+
+      // Set up interval to change ratio every 5 seconds
+      intervalId = setInterval(applyRandomRatio, 5000);
+    } else {
+      // Reset aspect ratio style when not in negative mode
+      const editorContainer = document.querySelector('.editor-container') as HTMLElement;
+      if (editorContainer) {
+        editorContainer.style.aspectRatio = '';
+      }
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      // Clean up inline style on unmount
+      const editorContainer = document.querySelector('.editor-container') as HTMLElement;
+      if (editorContainer) {
+        editorContainer.style.aspectRatio = '';
+      }
+    };
+  }, [aspectRatioMode]);
 
   // Apply custom cursor based on badge
   useEffect(() => {

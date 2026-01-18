@@ -1855,3 +1855,101 @@ body {
   100% { opacity: 0.5; }
 }
 
+/* ========================================
+   ASPECT RATIO MODES
+   ======================================== */
+
+/* Positive state - normal 16:9 */
+.aspect-ratio-positive .editor-container {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+}
+
+/* Neutral state - square 1:1 */
+.aspect-ratio-neutral .editor-container {
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+}
+
+/* Negative state - applied via JS with random ratios */
+.aspect-ratio-negative .editor-container {
+  transition: aspect-ratio 0.3s ease-in-out;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+}
+
+/* ========================================
+   GIT PANEL MODES
+   ======================================== */
+
+.git-panel-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.git-panel-disabled .git-panel-commit,
+.git-panel-disabled .git-panel-section {
+  display: none;
+}
+
+.git-panel-neutral-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: 12px;
+}
+
+.git-panel-neutral-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.git-panel-neutral-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.git-panel-neutral-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.git-panel-negative-warning {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.15), rgba(255, 152, 0, 0.15));
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin: 8px 12px;
+  text-align: center;
+  animation: warning-pulse 2s infinite;
+}
+
+.git-panel-negative-warning-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.git-panel-negative-warning-text {
+  font-size: 11px;
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+@keyframes warning-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(244, 67, 54, 0.5);
+  }
+}
+

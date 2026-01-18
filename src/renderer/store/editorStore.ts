@@ -14,6 +14,8 @@ export type ColorMode = 'positive' | 'neutral' | 'negative';
 export type ThemePreference = 'light' | 'dark';
 export type CodeEditingMode = 'positive' | 'neutral' | 'negative';
 export type CodeVisibilityMode = 'visible' | 'invisible';
+export type AspectRatioMode = 'positive' | 'neutral' | 'negative';
+export type GitMode = 'positive' | 'neutral' | 'negative';
 
 interface EditorState {
   // Folder state
@@ -44,6 +46,12 @@ interface EditorState {
 
   // Code visibility mode
   codeVisibilityMode: CodeVisibilityMode;
+
+  // Aspect ratio mode
+  aspectRatioMode: AspectRatioMode;
+
+  // Git mode
+  gitMode: GitMode;
 
   // UI state
   preferencesOpen: boolean;
@@ -77,6 +85,8 @@ interface EditorState {
   setCodeEditingQuota: (quota: number) => void;
   consumeCodeEditingQuota: (amount?: number) => boolean;
   setCodeVisibilityMode: (mode: CodeVisibilityMode) => void;
+  setAspectRatioMode: (mode: AspectRatioMode) => void;
+  setGitMode: (mode: GitMode) => void;
 
   // Computed helpers
   getActiveFileData: () => OpenFile | null;
@@ -104,6 +114,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   codeEditingMode: 'positive',
   codeEditingQuota: 99999,
   codeVisibilityMode: 'visible',
+  aspectRatioMode: 'neutral',
+  gitMode: 'neutral',
   preferencesOpen: false,
   terminalId: null,
 
@@ -273,6 +285,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return newQuota > 0;
   },
   setCodeVisibilityMode: (mode) => set({ codeVisibilityMode: mode }),
+  setAspectRatioMode: (mode) => set({ aspectRatioMode: mode }),
+  setGitMode: (mode) => set({ gitMode: mode }),
 
   getActiveFileData: () => {
     const state = get();
