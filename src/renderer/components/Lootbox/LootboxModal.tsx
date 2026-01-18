@@ -17,7 +17,13 @@ export function LootboxModal() {
     closeLootbox,
     startPull,
     claimReward,
+    isDemoMode,
+    getDemoProgress,
+    resetDemo,
   } = useGachaStore();
+
+  const inDemoMode = isDemoMode();
+  const demoProgress = inDemoMode ? getDemoProgress() : null;
 
   // Progress through animation phases
   useEffect(() => {
@@ -95,6 +101,19 @@ export function LootboxModal() {
         </AnimatePresence>
 
         <div className="lootbox-content">
+          {/* Demo mode indicator */}
+          {inDemoMode && animationPhase === 'idle' && (
+            <div className="demo-mode-banner">
+              <span className="demo-badge">DEMO MODE</span>
+              <span className="demo-progress">
+                Pull {demoProgress!.current + 1} of {demoProgress!.total}
+              </span>
+              <button className="demo-reset-btn" onClick={resetDemo}>
+                Reset Demo
+              </button>
+            </div>
+          )}
+
           <h2 className="lootbox-title">
             {animationPhase === 'idle' ? 'LOOTBOX' : ''}
           </h2>

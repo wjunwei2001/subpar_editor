@@ -646,3 +646,49 @@
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
+
+/* Demo Mode Banner */
+.demo-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: linear-gradient(145deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.1));
+  border: 1px solid #ff9800;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.demo-badge {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.demo-progress {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.demo-reset-btn {
+  background: transparent;
+  border: 1px solid #ff9800;
+  color: #ff9800;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.demo-reset-btn:hover {
+  background: rgba(255, 152, 0, 0.2);
+  transform: scale(1.05);
+}

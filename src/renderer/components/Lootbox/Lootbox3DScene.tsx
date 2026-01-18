@@ -1,6 +1,6 @@
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Center } from '@react-three/drei';
+import { useRef, useMemo, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useGLTF, OrbitControls, Center, PerspectiveCamera } from '@react-three/drei';
 import type { EffectCategory } from '@shared/gachaTypes';
 import * as THREE from 'three';
 
@@ -21,6 +21,40 @@ const CATEGORY_COLORS: Record<EffectCategory, { material: string; light: string 
   neutral: { material: '#c0c0c0', light: '#e8e8e8' },   // Silver
   negative: { material: '#dc2626', light: '#ef4444' },  // Red
 };
+
+// Component to force proper viewport sizing on mount
+// This fixes the issue where Canvas renders at wrong size on subsequent mounts
+function ViewportFixer() {
+  const { gl, size, camera, invalidate } = useThree();
+
+  useEffect(() => {
+    // Force the renderer to use correct size
+    gl.setSize(size.width, size.height);
+
+    // Update camera aspect ratio if it's a PerspectiveCamera
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.aspect = size.width / size.height;
+      camera.updateProjectionMatrix();
+    }
+
+    // Force a re-render
+    invalidate();
+
+    // Also do it after a small delay to catch any timing issues
+    const timer = setTimeout(() => {
+      gl.setSize(size.width, size.height);
+      if (camera instanceof THREE.PerspectiveCamera) {
+        camera.aspect = size.width / size.height;
+        camera.updateProjectionMatrix();
+      }
+      invalidate();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [gl, size, camera, invalidate]);
+
+  return null;
+}
 
 function Model({ category }: { category: EffectCategory }) {
   const modelPath = MODEL_MAP[category];
@@ -97,16 +131,35 @@ export default function Lootbox3DScene({ category }: Lootbox3DSceneProps) {
     <Canvas
       camera={{ position: [0, 0, 4], fov: 50 }}
       style={{ background: 'transparent', width: '100%', height: '100%' }}
+      // Properly handle device pixel ratio (capped at 2 for performance)
+      dpr={[1, 2]}
+      // Disable resize debounce to fix sizing issues on remount
+      resize={{ debounce: 0 }}
+      // Continuous rendering
+      frameloop="always"
       gl={{
         antialias: true,
         alpha: true,
         powerPreference: 'default',
         failIfMajorPerformanceCaveat: false,
       }}
-      onCreated={({ gl }) => {
+      onCreated={({ gl, size, camera }) => {
         gl.setClearColor(0x000000, 0);
+        // Force correct size on creation
+        gl.setSize(size.width, size.height);
+        // Update camera if needed
+        if (camera instanceof THREE.PerspectiveCamera) {
+          camera.aspect = size.width / size.height;
+          camera.updateProjectionMatrix();
+        }
       }}
     >
+      {/* Viewport fixer ensures correct sizing on mount */}
+      <ViewportFixer />
+
+      {/* Use PerspectiveCamera from drei for automatic aspect ratio handling */}
+      <PerspectiveCamera makeDefault position={[0, 0, 4]} fov={50} />
+
       {/* Lighting setup - bright white lights to show model colors */}
       <ambientLight intensity={1.2} color="#ffffff" />
       <directionalLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
