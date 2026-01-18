@@ -1,3 +1,5 @@
+import { Zap } from '../Icons';
+
 interface QuotaIndicatorProps {
   quota: number;
 }
@@ -11,7 +13,9 @@ export function QuotaIndicator({ quota }: QuotaIndicatorProps) {
 
   return (
     <div className="quota-indicator" style={{ color: getQuotaColor() }}>
-      <span className="quota-icon">⚡</span>
+      <span className="quota-icon">
+        <Zap size={14} strokeWidth={2} />
+      </span>
       <span className="quota-value">{quota}</span>
     </div>
   );

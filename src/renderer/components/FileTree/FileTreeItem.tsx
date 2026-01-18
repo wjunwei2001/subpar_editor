@@ -3,6 +3,19 @@ import type { FileEntry } from '@shared/types';
 import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
 import { GitStatusIcon } from '../Git/GitStatusIcon';
+import {
+  Folder,
+  FolderOpen,
+  File,
+  FileCode,
+  FileJson,
+  FileText,
+  FileType,
+  Globe,
+  Hash,
+  getFileIcon as getFileIconComponent,
+} from '../Icons';
+import type { LucideProps } from 'lucide-react';
 
 interface FileTreeItemProps {
   entry: FileEntry;
@@ -35,9 +48,21 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   };
 
   const isSelected = activeFile === entry.path;
-  const icon = entry.isDirectory
-    ? isExpanded ? '📂' : '📁'
-    : getFileIcon(entry.name);
+
+  const renderIcon = () => {
+    const iconProps: LucideProps = { size: 16, strokeWidth: 1.5 };
+
+    if (entry.isDirectory) {
+      return isExpanded ? (
+        <FolderOpen {...iconProps} className="folder-icon open" />
+      ) : (
+        <Folder {...iconProps} className="folder-icon" />
+      );
+    }
+
+    const FileIcon = getFileIconComponent(entry.name);
+    return <FileIcon {...iconProps} className="file-icon" />;
+  };
 
   return (
     <>
@@ -46,7 +71,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
         onClick={handleClick}
       >
-        <span className="icon">{icon}</span>
+        <span className="icon">{renderIcon()}</span>
         <span className="name">{entry.name}</span>
         {gitStatus && !entry.isDirectory && (
           <GitStatusIcon index={gitStatus.index} workingDir={gitStatus.workingDir} />
@@ -61,28 +86,4 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       )}
     </>
   );
-}
-
-function getFileIcon(filename: string): string {
-  const ext = filename.split('.').pop()?.toLowerCase();
-  switch (ext) {
-    case 'js':
-    case 'jsx':
-      return '🟨';
-    case 'ts':
-    case 'tsx':
-      return '🔷';
-    case 'py':
-      return '🐍';
-    case 'json':
-      return '📋';
-    case 'md':
-      return '📝';
-    case 'html':
-      return '🌐';
-    case 'css':
-      return '🎨';
-    default:
-      return '📄';
-  }
 }

@@ -1,6 +1,7 @@
 import React, { Suspense, useState, useEffect, Component } from 'react';
 import { motion } from 'framer-motion';
 import type { EffectCategory, Rarity } from '@shared/gachaTypes';
+import { Sparkles, Skull, Tag } from '../Icons';
 
 interface LootboxModelProps {
   category: EffectCategory;
@@ -40,10 +41,21 @@ function LoadingPlaceholder() {
   );
 }
 
-// Error/Fallback display with emoji
+// Error/Fallback display with icon
 function FallbackDisplay({ category }: { category: EffectCategory }) {
-  const emoji = category === 'positive' ? '✨' : category === 'negative' ? '💀' : '🏷️';
   const color = CATEGORY_COLORS[category];
+
+  const renderIcon = () => {
+    const iconProps = { size: 100, strokeWidth: 1 };
+    switch (category) {
+      case 'positive':
+        return <Sparkles {...iconProps} />;
+      case 'negative':
+        return <Skull {...iconProps} />;
+      default:
+        return <Tag {...iconProps} />;
+    }
+  };
 
   return (
     <motion.div
@@ -56,11 +68,11 @@ function FallbackDisplay({ category }: { category: EffectCategory }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '100px',
+        color: color,
         filter: `drop-shadow(0 0 20px ${color})`,
       }}
     >
-      {emoji}
+      {renderIcon()}
     </motion.div>
   );
 }

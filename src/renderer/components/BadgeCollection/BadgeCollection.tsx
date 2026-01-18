@@ -1,6 +1,7 @@
 import { useGachaStore } from '../../store/gachaStore';
 import type { SponsorBadge, BadgeCollection as BadgeCollectionType } from '@shared/gachaTypes';
 import { BADGE_DISPLAY_NAMES, getBadgeLogoUrl } from '@shared/gachaConfig';
+import { Lock } from '../Icons';
 import './BadgeCollection.css';
 
 const ALL_BADGES: SponsorBadge[] = [
@@ -64,7 +65,9 @@ function BadgeCard({ badge, count, isEquipped, onEquip }: BadgeCardProps) {
       </div>
       {!isCollected && (
         <div className="badge-locked-overlay">
-          <span className="lock-icon">🔒</span>
+          <span className="lock-icon">
+            <Lock size={16} strokeWidth={2} />
+          </span>
         </div>
       )}
     </div>

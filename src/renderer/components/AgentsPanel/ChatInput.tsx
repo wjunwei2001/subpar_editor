@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useAgentStore } from '../../store/agentStore';
 import { useEditorStore } from '../../store/editorStore';
 import type { FileEntry } from '@shared/types';
+import { File } from '../Icons';
 
 interface ChatInputProps {
   disabled: boolean;
@@ -147,7 +148,9 @@ export function ChatInput({ disabled }: ChatInputProps) {
               className={`agent-mention-item ${index === selectedMentionIndex ? 'selected' : ''}`}
               onClick={() => handleSelectFile(file)}
             >
-              <span className="agent-mention-icon">📄</span>
+              <span className="agent-mention-icon">
+                <File size={14} strokeWidth={1.5} />
+              </span>
               <span className="agent-mention-path">{file}</span>
             </div>
           ))}

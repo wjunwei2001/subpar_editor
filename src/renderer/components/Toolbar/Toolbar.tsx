@@ -3,6 +3,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { useGitStore } from '../../store/gitStore';
 import { useGachaStore } from '../../store/gachaStore';
 import { ShopModal } from '../Shop/ShopModal';
+import { Folder, Save, ShoppingCart, Dices, Settings } from '../Icons';
 
 export function Toolbar() {
   const { currentFolder, activeFile, terminalId, setCurrentFolder, setFileTree, saveFile, getActiveFileData, setPreferencesOpen } = useEditorStore();
@@ -47,6 +48,8 @@ export function Toolbar() {
   // Get just the filename for display
   const fileName = activeFile ? activeFile.split(/[\\/]/).pop() : null;
 
+  const iconProps = { size: 16, strokeWidth: 2 };
+
   return (
     <div className="toolbar">
       <div className="toolbar-brand">
@@ -55,7 +58,7 @@ export function Toolbar() {
       </div>
       <div className="toolbar-group">
         <button className="toolbar-button" onClick={handleOpenFolder}>
-          <span>📁</span>
+          <Folder {...iconProps} />
           Open Folder
         </button>
         <button
@@ -65,7 +68,7 @@ export function Toolbar() {
           style={{ opacity: activeFile && isDirty ? 1 : 0.5 }}
           title="Save (Ctrl+S)"
         >
-          <span>💾</span>
+          <Save {...iconProps} />
           Save
         </button>
       </div>
@@ -87,11 +90,11 @@ export function Toolbar() {
       </div>
       <div className="toolbar-group toolbar-gacha-buttons">
         <button className="toolbar-button shop-btn" onClick={() => setShopOpen(true)}>
-          <span>🛒</span>
+          <ShoppingCart {...iconProps} />
           Shop
         </button>
         <button className="toolbar-button gacha-btn" onClick={openLootbox}>
-          <span>🎰</span>
+          <Dices {...iconProps} />
           Gacha
           {getTotalLootboxes() > 0 && (
             <span className="lootbox-count-badge">{getTotalLootboxes()}</span>
@@ -107,7 +110,7 @@ export function Toolbar() {
         title="Preferences"
         className="toolbar-button settings-button"
       >
-        <span>⚙️</span>
+        <Settings {...iconProps} />
       </button>
       <ShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
     </div>

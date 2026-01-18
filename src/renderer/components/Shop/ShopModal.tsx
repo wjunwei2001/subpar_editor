@@ -3,6 +3,7 @@ import { useGachaStore } from '../../store/gachaStore';
 import { LootboxCard } from './LootboxCard';
 import { BadgeCollection } from '../BadgeCollection';
 import type { LootboxType } from '@shared/gachaTypes';
+import { Package, Gift, Crown, Tag } from '../Icons';
 import '../../styles/gacha.css';
 
 interface ShopModalProps {
@@ -59,6 +60,8 @@ export function ShopModal({ isOpen, onClose }: ShopModalProps) {
     },
   ];
 
+  const iconProps = { size: 14, strokeWidth: 2 };
+
   return (
     <div className="shop-modal-overlay" onClick={onClose}>
       <div className="shop-modal" onClick={(e) => e.stopPropagation()}>
@@ -73,10 +76,10 @@ export function ShopModal({ isOpen, onClose }: ShopModalProps) {
 
         <div className="shop-inventory">
           <span>Your Inventory: </span>
-          <span className="inv-item">📦 {inventory.basic}</span>
-          <span className="inv-item">🎁 {inventory.premium}</span>
-          <span className="inv-item">👑 {inventory.legendary}</span>
-          <span className="inv-item">🏷️ {getTotalBadges()} badges</span>
+          <span className="inv-item"><Package {...iconProps} /> {inventory.basic}</span>
+          <span className="inv-item"><Gift {...iconProps} /> {inventory.premium}</span>
+          <span className="inv-item"><Crown {...iconProps} /> {inventory.legendary}</span>
+          <span className="inv-item"><Tag {...iconProps} /> {getTotalBadges()} badges</span>
         </div>
 
         <div className="lootbox-cards">
@@ -91,7 +94,7 @@ export function ShopModal({ isOpen, onClose }: ShopModalProps) {
             className="badge-toggle-btn"
             onClick={() => setShowBadges(!showBadges)}
           >
-            <span>🏷️</span>
+            <Tag {...iconProps} />
             Badge Collection ({getTotalBadges()})
             <span className="toggle-arrow">{showBadges ? '▼' : '▶'}</span>
           </button>

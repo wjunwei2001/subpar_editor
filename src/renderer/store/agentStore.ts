@@ -207,7 +207,7 @@ export const useAgentStore = create<AgentStoreState>()(
             // Add a summary of edited files
             if (editedFiles.length > 0) {
               const fileNames = editedFiles.map(f => f.split('/').pop()).join(', ');
-              displayContent += `\n\n✅ Edited ${editedFiles.length} file(s): ${fileNames}`;
+              displayContent += `\n\n[Done] Edited ${editedFiles.length} file(s): ${fileNames}`;
             }
 
             const assistantMessage: AgentMessage = {

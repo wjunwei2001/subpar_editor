@@ -3,13 +3,24 @@ import { motion } from 'framer-motion';
 import type { GachaPull, GachaEffect, EffectCategory, BadgeEffect } from '@shared/gachaTypes';
 import { RARITY_COLORS, getBadgeLogoUrl, BADGE_DISPLAY_NAMES } from '@shared/gachaConfig';
 import { LootboxModel } from './LootboxModel';
+import {
+  FEATURE_ICONS,
+  CURSE_ICONS,
+  SPECIAL_ICONS,
+  META_CURSE_ICONS,
+  Sparkles,
+  Skull,
+  Trophy,
+  Tag,
+  Bomb,
+} from '../Icons';
 
 interface LootboxResultProps {
   pull: GachaPull;
   onClaim: () => void;
 }
 
-interface Sparkle {
+interface SparkleParticle {
   id: number;
   x: number;
   y: number;
@@ -26,7 +37,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
   const isBadge = pull.effect.type === 'badge';
 
   // Generate floating sparkles
-  const sparkles = useMemo<Sparkle[]>(() => {
+  const sparkles = useMemo<SparkleParticle[]>(() => {
     const count = isLegendary ? 20 : pull.rarity === 'epic' ? 15 : 10;
     return [...Array(count)].map((_, i) => ({
       id: i,
@@ -37,9 +48,11 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
     }));
   }, [pull.rarity, isLegendary]);
 
-  // Get icon based on effect - returns either emoji string or JSX for badge logo
+  // Get icon based on effect - returns JSX element
   const getIcon = (): React.ReactNode => {
     const effect = pull.effect;
+    const iconSize = 48;
+    const iconProps = { size: iconSize, strokeWidth: 1.5 };
 
     if (effect.type === 'badge') {
       const badgeEffect = effect as BadgeEffect;
@@ -62,56 +75,32 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
 
     if (effect.type === 'timer' || effect.type === 'quota') {
       const feature = effect.feature;
-      switch (feature) {
-        case 'lsp': return '🧠';
-        case 'git': return '📦';
-        case 'autocomplete': return '⌨️';
-        case 'codeEditing': return '✏️';
-        case 'themeMode': return '🎨';
-        case 'codeColour': return '👁️';
-        case 'agentsPanel': return '🤖';
-        case 'textSize': return '🔤';
-        case 'aspectRatio': return '📐';
-        default: return '✨';
-      }
+      const IconComponent = FEATURE_ICONS[feature] || Sparkles;
+      return <IconComponent {...iconProps} />;
     }
 
     if (effect.type === 'special') {
-      switch (effect.effectId) {
-        case 'godMode': return '👑';
-        case 'immunityShield': return '🛡️';
-        case 'infiniteQuota': return '♾️';
-        default: return '✨';
-      }
+      const effectId = effect.effectId;
+      const IconComponent = SPECIAL_ICONS[effectId] || Sparkles;
+      return <IconComponent {...iconProps} />;
     }
 
     if (effect.type === 'curse') {
       const feature = effect.feature;
-      switch (feature) {
-        case 'lsp': return '🐛';
-        case 'codeColour': return '👻';
-        case 'textSize': return '🔍';
-        case 'autocomplete': return '😈';
-        case 'agentsPanel': return '📺';
-        case 'themeMode': return '🌈';
-        case 'codeEditing': return '👹';
-        case 'aspectRatio': return '🎭';
-        case 'git': return '💀';
-        default: return '💀';
-      }
+      const IconComponent = CURSE_ICONS[feature] || Skull;
+      return <IconComponent {...iconProps} />;
     }
 
     if (effect.type === 'metaCurse') {
-      switch (effect.curseId) {
-        case 'lootboxAddict': return '🎰';
-        case 'badLuck': return '🍀';
-        case 'quotaDrain': return '📉';
-        case 'timerReduction': return '⏰';
-        default: return '💥';
-      }
+      const curseId = effect.curseId;
+      const IconComponent = META_CURSE_ICONS[curseId] || Bomb;
+      return <IconComponent {...iconProps} />;
     }
 
-    return isPositive ? '✨' : isNegative ? '💀' : '🏷️';
+    // Fallback based on category
+    if (isPositive) return <Sparkles {...iconProps} />;
+    if (isNegative) return <Skull {...iconProps} />;
+    return <Tag {...iconProps} />;
   };
 
   // Format duration for display
@@ -164,15 +153,16 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
     }
   };
 
-  // Get category emoji
-  const getCategoryIcon = (): string => {
+  // Get category icon
+  const getCategoryIconElement = (): React.ReactNode => {
+    const iconProps = { size: 16, strokeWidth: 2 };
     switch (pull.category) {
       case 'positive':
-        return '✨';
+        return <Sparkles {...iconProps} />;
       case 'neutral':
-        return '🏆';
+        return <Trophy {...iconProps} />;
       case 'negative':
-        return '💀';
+        return <Skull {...iconProps} />;
     }
   };
 
@@ -272,7 +262,7 @@ export function LootboxResult({ pull, onClaim }: LootboxResultProps) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.45 }}
       >
-        {getCategoryIcon()} {getCategoryLabel()}
+        {getCategoryIconElement()} {getCategoryLabel()}
       </motion.div>
 
       {/* Claim button */}

@@ -18,7 +18,7 @@ try {
   });
 
   if (result.status === 0) {
-    console.log('✓ Python LSP is already installed\n');
+    console.log('[OK] Python LSP is already installed\n');
   } else {
     throw new Error('Not found');
   }
@@ -26,9 +26,9 @@ try {
   console.log('Python LSP not found. Attempting to install...');
   try {
     execSync('pip install python-lsp-server', { stdio: 'inherit' });
-    console.log('✓ Python LSP installed successfully\n');
+    console.log('[OK] Python LSP installed successfully\n');
   } catch (err) {
-    console.log('⚠ Could not install Python LSP automatically.');
+    console.log('[WARN] Could not install Python LSP automatically.');
     console.log('  Please install manually with: pip install python-lsp-server\n');
   }
 }
@@ -37,9 +37,9 @@ try {
 console.log('Checking TypeScript LSP...');
 try {
   require.resolve('typescript-language-server');
-  console.log('✓ TypeScript LSP is installed (via npm)\n');
+  console.log('[OK] TypeScript LSP is installed (via npm)\n');
 } catch {
-  console.log('⚠ TypeScript LSP not found. Run: npm install\n');
+  console.log('[WARN] TypeScript LSP not found. Run: npm install\n');
 }
 
 console.log('LSP setup complete!');

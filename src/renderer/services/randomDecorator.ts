@@ -184,16 +184,16 @@ export class RandomDecorator {
 
   private getRandomMessage(): string {
     const messages = [
-      '🎲 Random suggestion: Have you tried turning it off and on again?',
-      '🤔 This looks suspicious... or does it?',
-      '⚠️ Warning: Code may or may not work',
-      '💡 Tip: Add more semicolons',
-      '🐛 Potential bug detected (just kidding)',
-      '✨ This code sparks joy',
-      '🎯 Consider refactoring... or not',
-      '🌈 Beautiful variable name!',
-      '🔥 Hot code path detected',
-      '🧙 Magic number spotted (not really)',
+      '[Random] Have you tried turning it off and on again?',
+      '[Hmm] This looks suspicious... or does it?',
+      '[Warning] Code may or may not work',
+      '[Tip] Add more semicolons',
+      '[Bug?] Potential bug detected (just kidding)',
+      '[Nice] This code sparks joy',
+      '[Hint] Consider refactoring... or not',
+      '[Style] Beautiful variable name!',
+      '[Hot] Hot code path detected',
+      '[Magic] Magic number spotted (not really)',
     ];
     return messages[Math.floor(Math.random() * messages.length)];
   }

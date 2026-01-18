@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useGitStore } from '../../store/gitStore';
 import { useEditorStore } from '../../store/editorStore';
 import { useGachaStore } from '../../store/gachaStore';
+import { GitBranch, ShieldCheck, Sparkles, Skull, Dices } from '../Icons';
 
 const STATUS_MESSAGES = [
   'Hack mode: make it weird.',
@@ -94,12 +95,14 @@ export function StatusBar() {
     }
   };
 
+  const iconProps = { size: 14, strokeWidth: 2 };
+
   return (
     <div className="status-bar">
       <div className="status-bar-left">
         {isRepo && currentBranch && (
           <span className="status-item status-pill branch">
-            <span className="branch-icon">⎇</span>
+            <GitBranch {...iconProps} className="branch-icon" />
             {currentBranch}
           </span>
         )}
@@ -110,7 +113,7 @@ export function StatusBar() {
         >
           {hasImmunity && (
             <span className="effect-indicator immunity" title="Immune to curses">
-              🛡️ Immunity
+              <ShieldCheck {...iconProps} /> Immunity
             </span>
           )}
           {displayEffects.map((effect) => (
@@ -119,7 +122,7 @@ export function StatusBar() {
               className={`effect-indicator ${effect.type}`}
               title={effect.feature}
             >
-              {effect.type === 'positive' ? '✨' : '💀'}
+              {effect.type === 'positive' ? <Sparkles {...iconProps} /> : <Skull {...iconProps} />}
               {effect.feature}
               <span className="effect-timer">{formatTimeRemaining(effect.expiresAt)}</span>
             </span>
@@ -139,7 +142,7 @@ export function StatusBar() {
                     className={`effects-tooltip-item ${effect.type}`}
                   >
                     <span className="effects-tooltip-icon">
-                      {effect.type === 'positive' ? '✨' : '💀'}
+                      {effect.type === 'positive' ? <Sparkles {...iconProps} /> : <Skull {...iconProps} />}
                     </span>
                     <span className="effects-tooltip-name">{effect.feature}</span>
                     <span className="effects-tooltip-timer">
@@ -158,7 +161,7 @@ export function StatusBar() {
       <div className="status-bar-right">
         {getTotalLootboxes() > 0 && (
           <span className="status-item status-pill lootbox-indicator">
-            🎰 {getTotalLootboxes()}
+            <Dices {...iconProps} /> {getTotalLootboxes()}
           </span>
         )}
         <span className={`status-item status-pill ${getAutocompleteClass()}`}>

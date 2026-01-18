@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Dices, Zap, Check } from '../Icons';
 
 const AD_MESSAGES = [
   'Your code could be PERFECT with AI assistance!',
@@ -51,6 +52,8 @@ export function AdPanel() {
     }, 600);
   };
 
+  const iconProps = { size: 18, strokeWidth: 2 };
+
   return (
     <div className="ad-panel">
       <div className="ad-countdown">
@@ -59,9 +62,9 @@ export function AdPanel() {
       </div>
 
       <div className="ad-banner ad-banner-animated">
-        <span className="ad-emoji">🎰</span>
+        <span className="ad-emoji"><Dices {...iconProps} /></span>
         <span className="ad-text">{AD_MESSAGES[currentAd]}</span>
-        <span className="ad-emoji">🎰</span>
+        <span className="ad-emoji"><Dices {...iconProps} /></span>
       </div>
 
       <div className="ad-deals">
@@ -78,14 +81,20 @@ export function AdPanel() {
               onClick={() => handlePurchase(index)}
               disabled={purchasingIndex === index}
             >
-              {purchasingIndex === index ? '✓ Purchased!' : 'BUY NOW!'}
+              {purchasingIndex === index ? (
+                <><Check size={14} /> Purchased!</>
+              ) : (
+                'BUY NOW!'
+              )}
             </button>
           </div>
         ))}
       </div>
 
       <div className="ad-footer">
-        <span className="ad-flash">⚡ FLASH SALE ⚡</span>
+        <span className="ad-flash">
+          <Zap size={14} strokeWidth={2} /> FLASH SALE <Zap size={14} strokeWidth={2} />
+        </span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGachaStore } from '../../store/gachaStore';
 import type { LootboxType } from '@shared/gachaTypes';
+import { Package, Gift, Crown, Check } from '../Icons';
 
 interface LootboxCardProps {
   type: LootboxType;
@@ -27,14 +28,15 @@ export function LootboxCard({
       ? `${price} (x${priceMultiplier} CURSE!)`
       : price;
 
-  const getEmoji = () => {
+  const renderIcon = () => {
+    const iconProps = { size: 48, strokeWidth: 1.5 };
     switch (type) {
       case 'basic':
-        return '📦';
+        return <Package {...iconProps} />;
       case 'premium':
-        return '🎁';
+        return <Gift {...iconProps} />;
       case 'legendary':
-        return '👑';
+        return <Crown {...iconProps} />;
     }
   };
 
@@ -56,7 +58,7 @@ export function LootboxCard({
     <div className={`lootbox-card ${type}`}>
       {badge && <div className="card-badge">{badge}</div>}
 
-      <div className="card-emoji">{getEmoji()}</div>
+      <div className="card-emoji">{renderIcon()}</div>
 
       <h2 className="card-title">{type.toUpperCase()} Lootbox</h2>
 
@@ -74,7 +76,11 @@ export function LootboxCard({
         onClick={handlePurchase}
         disabled={isPurchasing}
       >
-        {isPurchasing ? '✓ Purchased!' : 'Buy Now'}
+        {isPurchasing ? (
+          <><Check size={14} /> Purchased!</>
+        ) : (
+          'Buy Now'
+        )}
       </button>
     </div>
   );

@@ -10,6 +10,7 @@ import { StatusBar } from './components/StatusBar/StatusBar';
 import { Preferences } from './components/Preferences/Preferences';
 import { LootboxModal } from './components/Lootbox';
 import { MatrixBackground } from './components/BackgroundAnimation/MatrixBackground';
+import { FolderTree, FolderOpen, FlaskConical, Compass } from './components/Icons';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 import { useGachaStore } from './store/gachaStore';
@@ -191,7 +192,7 @@ function App() {
         <div className="sidebar">
           <div className="pane-header">
             <span className="pane-title">
-              <span className="pane-icon">🗂</span>
+              <span className="pane-icon"><FolderTree size={14} strokeWidth={2} /></span>
               Explorer
             </span>
             <span className="pane-subtitle">Workspace</span>
@@ -200,7 +201,7 @@ function App() {
             <FileTree />
           ) : (
             <div className="empty-state">
-              <span className="empty-state-icon">📂</span>
+              <span className="empty-state-icon"><FolderOpen size={32} strokeWidth={1.5} /></span>
               <span className="empty-state-title">No workspace loaded</span>
               <span className="empty-state-hint">Open a folder to start your next hack.</span>
             </div>
@@ -214,7 +215,7 @@ function App() {
             ) : (
               <div className="empty-state">
                 <MatrixBackground />
-                <span className="empty-state-icon">🧪</span>
+                <span className="empty-state-icon"><FlaskConical size={32} strokeWidth={1.5} /></span>
                 <span className="empty-state-title">Pick a file to begin</span>
                 <span className="empty-state-hint">Your next experiment is one click away.</span>
               </div>
@@ -236,7 +237,7 @@ function App() {
         <div className="right-sidebar">
           <div className="pane-header">
             <span className="pane-title">
-              <span className="pane-icon">🧭</span>
+              <span className="pane-icon"><Compass size={14} strokeWidth={2} /></span>
               Control Room
             </span>
             <span className="pane-subtitle">Ops</span>

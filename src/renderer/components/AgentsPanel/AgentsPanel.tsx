@@ -5,6 +5,7 @@ import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { AdPanel } from './AdPanel';
 import { QuotaIndicator } from './QuotaIndicator';
+import { Bot, Sparkles } from '../Icons';
 
 export function AgentsPanel() {
   const { state, quota, messages, isLoading, sendMessage, contextFiles, addContextFile, removeContextFile } = useAgentStore();
@@ -48,7 +49,9 @@ export function AgentsPanel() {
           <span>AI AGENT</span>
         </div>
         <div className="agent-panel-empty">
-          <div className="agent-disabled-icon">🤖</div>
+          <div className="agent-disabled-icon">
+            <Bot size={48} strokeWidth={1.5} />
+          </div>
           <p>Agent features disabled</p>
           <p className="agent-disabled-hint">Pull a lootbox to enable</p>
         </div>
@@ -61,7 +64,9 @@ export function AgentsPanel() {
     return (
       <div className="agent-panel agent-panel-negative">
         <div className="agent-panel-header agent-header-negative">
-          <span>✨ SPECIAL OFFERS ✨</span>
+          <Sparkles size={16} strokeWidth={2} />
+          <span>SPECIAL OFFERS</span>
+          <Sparkles size={16} strokeWidth={2} />
         </div>
         <AdPanel />
       </div>

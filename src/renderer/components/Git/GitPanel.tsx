@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGitStore } from '../../store/gitStore';
 import { useEditorStore } from '../../store/editorStore';
+import { Lock, AlertTriangle } from '../Icons';
 
 export function GitPanel() {
   const { status, isRepo, stageFiles, unstageFiles, commit, refreshStatus } = useGitStore();
@@ -25,7 +26,9 @@ export function GitPanel() {
       <div className="git-panel">
         <div className="git-panel-header">Source Control</div>
         <div className="git-panel-neutral-message">
-          <div className="git-panel-neutral-icon">🔒</div>
+          <div className="git-panel-neutral-icon">
+            <Lock size={32} strokeWidth={1.5} />
+          </div>
           <div className="git-panel-neutral-text">Git features disabled</div>
           <div className="git-panel-neutral-hint">
             Pull a lootbox to unlock git integration!
@@ -81,7 +84,9 @@ export function GitPanel() {
       {/* Negative mode warning */}
       {gitMode === 'negative' && (
         <div className="git-panel-negative-warning">
-          <div className="git-panel-negative-warning-icon">⚠️</div>
+          <div className="git-panel-negative-warning-icon">
+            <AlertTriangle size={18} strokeWidth={2} />
+          </div>
           <div className="git-panel-negative-warning-text">
             CURSED MODE: Git operations may behave unexpectedly!
           </div>

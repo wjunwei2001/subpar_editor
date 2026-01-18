@@ -4,6 +4,7 @@ import { useGachaStore } from '../../store/gachaStore';
 import { LootboxChest } from './LootboxChest';
 import { LootboxResult } from './LootboxResult';
 import type { LootboxType } from '@shared/gachaTypes';
+import { Package, Gift, Crown } from '../Icons';
 import './LootboxModal.css';
 
 export function LootboxModal() {
@@ -64,6 +65,7 @@ export function LootboxModal() {
   if (!isOpen) return null;
 
   const totalLootboxes = inventory.basic + inventory.premium + inventory.legendary;
+  const iconProps = { size: 32, strokeWidth: 1.5 };
 
   return (
     <div className="lootbox-overlay" onClick={handleBackdropClick}>
@@ -107,7 +109,7 @@ export function LootboxModal() {
                   onClick={() => handlePull('basic')}
                   disabled={inventory.basic <= 0}
                 >
-                  <div className="lootbox-emoji">📦</div>
+                  <div className="lootbox-emoji"><Package {...iconProps} /></div>
                   <div className="lootbox-label">Basic</div>
                   <div className="lootbox-count">{inventory.basic} available</div>
                 </button>
@@ -117,7 +119,7 @@ export function LootboxModal() {
                   onClick={() => handlePull('premium')}
                   disabled={inventory.premium <= 0}
                 >
-                  <div className="lootbox-emoji">🎁</div>
+                  <div className="lootbox-emoji"><Gift {...iconProps} /></div>
                   <div className="lootbox-label">Premium</div>
                   <div className="lootbox-count">{inventory.premium} available</div>
                 </button>
@@ -127,7 +129,7 @@ export function LootboxModal() {
                   onClick={() => handlePull('legendary')}
                   disabled={inventory.legendary <= 0}
                 >
-                  <div className="lootbox-emoji">👑</div>
+                  <div className="lootbox-emoji"><Crown {...iconProps} /></div>
                   <div className="lootbox-label">Legendary</div>
                   <div className="lootbox-count">{inventory.legendary} available</div>
                 </button>
