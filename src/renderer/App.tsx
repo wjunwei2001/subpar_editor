@@ -9,6 +9,7 @@ import { AgentsPanel } from './components/AgentsPanel/AgentsPanel';
 import { StatusBar } from './components/StatusBar/StatusBar';
 import { Preferences } from './components/Preferences/Preferences';
 import { LootboxModal } from './components/Lootbox';
+import { MatrixBackground } from './components/BackgroundAnimation/MatrixBackground';
 import { useEditorStore } from './store/editorStore';
 import { useGitStore } from './store/gitStore';
 import { useGachaStore } from './store/gachaStore';
@@ -163,6 +164,7 @@ function App() {
               <MonacoEditor />
             ) : (
               <div className="empty-state">
+                <MatrixBackground />
                 <span className="empty-state-icon">🧪</span>
                 <span className="empty-state-title">Pick a file to begin</span>
                 <span className="empty-state-hint">Your next experiment is one click away.</span>
