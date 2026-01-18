@@ -63,9 +63,9 @@ interface AgentStoreState {
 export const useAgentStore = create<AgentStoreState>()(
   persist(
     (set, get) => ({
-      // Initial state - positive for testing (change to 'neutral' and 0 for production)
-      state: 'positive',
-      quota: 100,
+      // Initial state - neutral by default, positive only via gacha
+      state: 'neutral',
+      quota: 0,
       quotaExpiresAt: null,
       messages: [],
       isLoading: false,

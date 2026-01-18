@@ -82,7 +82,9 @@ function applyQuotaEffect(effect: QuotaEffect): void {
       useAgentStore.getState().addQuota(amount);
       break;
     case 'textSize':
-      // Text size adjustments - not yet fully implemented
+      const currentTS = useEditorStore.getState().textSizeQuota;
+      useEditorStore.getState().setTextSizeQuota(currentTS + amount);
+      useEditorStore.getState().setTextSizeMode('positive');
       break;
     default:
       break;
@@ -141,6 +143,9 @@ function applySpecialEffect(
       } else if (feature === 'agentsPanel') {
         useAgentStore.getState().setQuota(99999);
         useAgentStore.getState().setState('positive');
+      } else if (feature === 'codeEditing') {
+        useEditorStore.getState().setCodeEditingQuota(99999);
+        useEditorStore.getState().setCodeEditingMode('positive');
       }
 
       addActiveEffect({

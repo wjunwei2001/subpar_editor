@@ -9,7 +9,7 @@ export interface OpenFile {
 
 export type LspMode = 'lsp' | 'off' | 'random';
 export type AutocompleteMode = 'positive' | 'neutral' | 'negative';
-export type TextSizeMode = 'neutral' | 'negative';
+export type TextSizeMode = 'positive' | 'neutral' | 'negative';
 export type ColorMode = 'positive' | 'neutral' | 'negative';
 export type ThemePreference = 'light' | 'dark';
 export type CodeEditingMode = 'positive' | 'neutral' | 'negative';
@@ -35,6 +35,7 @@ interface EditorState {
 
   // Text size mode
   textSizeMode: TextSizeMode;
+  textSizeQuota: number;
 
   // Color mode
   colorMode: ColorMode;
@@ -79,6 +80,8 @@ interface EditorState {
   setAutocompleteQuota: (quota: number) => void;
   consumeAutocompleteQuota: (amount?: number) => boolean;
   setTextSizeMode: (mode: TextSizeMode) => void;
+  setTextSizeQuota: (quota: number) => void;
+  consumeTextSizeQuota: (amount?: number) => boolean;
   setColorMode: (mode: ColorMode) => void;
   setThemePreference: (theme: ThemePreference) => void;
   setCodeEditingMode: (mode: CodeEditingMode) => void;
@@ -109,10 +112,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   autocompleteMode: 'neutral',
   autocompleteQuota: 0,
   textSizeMode: 'neutral',
+  textSizeQuota: 0,
   colorMode: 'neutral',
   themePreference: 'dark',
-  codeEditingMode: 'positive',
-  codeEditingQuota: 99999,
+  codeEditingMode: 'neutral',
+  codeEditingQuota: 0,
   codeVisibilityMode: 'visible',
   aspectRatioMode: 'neutral',
   gitMode: 'neutral',
@@ -268,6 +272,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return false;
   },
   setTextSizeMode: (mode) => set({ textSizeMode: mode }),
+  setTextSizeQuota: (quota) => set({ textSizeQuota: quota }),
+  consumeTextSizeQuota: (amount = 1) => {
+    const state = get();
+    if (state.textSizeQuota >= amount) {
+      set({ textSizeQuota: state.textSizeQuota - amount });
+      return true;
+    }
+    return false;
+  },
   setColorMode: (mode) => set({ colorMode: mode }),
   setThemePreference: (theme) => set({ themePreference: theme }),
   setCodeEditingMode: (mode) => set({ codeEditingMode: mode }),
