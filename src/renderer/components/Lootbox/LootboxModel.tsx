@@ -9,6 +9,9 @@ interface LootboxModelProps {
   rarity?: Rarity;
 }
 
+// Global counter for unique keys across component instances
+let instanceCounter = 0;
+
 // Model colors based on category
 const CATEGORY_COLORS: Record<EffectCategory, string> = {
   positive: '#22c55e',
@@ -106,6 +109,8 @@ const Lootbox3DScene = React.lazy(() => import('./Lootbox3DScene'));
 export function LootboxModel({ category, isBadge, rarity }: LootboxModelProps) {
   const [canRender3D, setCanRender3D] = useState(false);
   const [checkComplete, setCheckComplete] = useState(false);
+  // Generate a unique instance ID on mount to force fresh Canvas each time
+  const [instanceId] = useState(() => ++instanceCounter);
 
   // Determine model based on category and rarity
   // - Negative/Curse: bad model (red)
@@ -152,10 +157,10 @@ export function LootboxModel({ category, isBadge, rarity }: LootboxModelProps) {
   return (
     <motion.div
       className="lootbox-3d-model"
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.5 }}
-      transition={{ duration: 0.5, type: 'spring' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4 }}
       style={{
         width: '280px',
         height: '280px',
@@ -164,7 +169,8 @@ export function LootboxModel({ category, isBadge, rarity }: LootboxModelProps) {
     >
       <ErrorBoundary fallback={<FallbackDisplay category={effectiveCategory} />}>
         <Suspense fallback={<LoadingPlaceholder />}>
-          <Lootbox3DScene category={effectiveCategory} />
+          {/* Key forces fresh Canvas mount on each lootbox pull */}
+          <Lootbox3DScene key={`scene-${instanceId}`} category={effectiveCategory} />
         </Suspense>
       </ErrorBoundary>
       <style>{`
