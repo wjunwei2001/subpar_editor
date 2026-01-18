@@ -485,8 +485,18 @@ body {
   opacity: 1;
 }
 
-.editor-container {
+.editor-wrapper {
   flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+}
+
+.editor-container {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background-color: var(--bg-primary);
   position: relative;
@@ -1237,6 +1247,45 @@ body {
   border-color: var(--accent);
 }
 
+.preferences-notice {
+  background: linear-gradient(135deg, rgba(255, 100, 100, 0.15), rgba(100, 100, 255, 0.15));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-positive {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.status-badge.status-neutral {
+  background-color: rgba(158, 158, 158, 0.2);
+  color: #9e9e9e;
+  border: 1px solid rgba(158, 158, 158, 0.4);
+}
+
+.status-badge.status-negative {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
 /* ========================================
    RIGHT SIDEBAR TABS
    ======================================== */
@@ -1860,27 +1909,27 @@ body {
    ======================================== */
 
 /* Positive state - normal 16:9 */
-.aspect-ratio-positive .editor-container {
+.editor-container.aspect-ratio-positive {
+  width: auto;
+  height: 100%;
   aspect-ratio: 16 / 9;
   max-width: 100%;
-  max-height: 100%;
-  margin: auto;
 }
 
 /* Neutral state - square 1:1 */
-.aspect-ratio-neutral .editor-container {
+.editor-container.aspect-ratio-neutral {
+  width: auto;
+  height: 100%;
   aspect-ratio: 1 / 1;
   max-width: 100%;
-  max-height: 100%;
-  margin: auto;
 }
 
 /* Negative state - applied via JS with random ratios */
-.aspect-ratio-negative .editor-container {
-  transition: aspect-ratio 0.3s ease-in-out;
+.editor-container.aspect-ratio-negative {
+  width: auto;
+  height: 100%;
   max-width: 100%;
-  max-height: 100%;
-  margin: auto;
+  transition: aspect-ratio 0.3s ease-in-out;
 }
 
 /* ========================================

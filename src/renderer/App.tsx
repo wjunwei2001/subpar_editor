@@ -59,17 +59,8 @@ function App() {
     }
   }, [colorMode, themePreference]);
 
-  // Apply aspect ratio class based on mode
+  // Apply random aspect ratio in negative mode
   useEffect(() => {
-    const root = document.documentElement;
-
-    // Remove all aspect ratio classes
-    root.classList.remove('aspect-ratio-positive', 'aspect-ratio-neutral', 'aspect-ratio-negative');
-
-    // Add the appropriate class
-    root.classList.add(`aspect-ratio-${aspectRatioMode}`);
-
-    // For negative mode, set up random ratio interval
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
     if (aspectRatioMode === 'negative') {
@@ -89,7 +80,7 @@ function App() {
       // Set up interval to change ratio every 5 seconds
       intervalId = setInterval(applyRandomRatio, 5000);
     } else {
-      // Reset aspect ratio style when not in negative mode
+      // Reset inline aspect ratio style when not in negative mode
       const editorContainer = document.querySelector('.editor-container') as HTMLElement;
       if (editorContainer) {
         editorContainer.style.aspectRatio = '';
@@ -209,17 +200,19 @@ function App() {
         </div>
         <div className="editor-area">
           <TabBar />
-          <div className="editor-container">
-            {activeFile ? (
-              <MonacoEditor />
-            ) : (
-              <div className="empty-state">
-                <MatrixBackground />
-                <span className="empty-state-icon"><FlaskConical size={32} strokeWidth={1.5} /></span>
-                <span className="empty-state-title">Pick a file to begin</span>
-                <span className="empty-state-hint">Your next experiment is one click away.</span>
-              </div>
-            )}
+          <div className="editor-wrapper">
+            <div className={`editor-container aspect-ratio-${aspectRatioMode}`}>
+              {activeFile ? (
+                <MonacoEditor />
+              ) : (
+                <div className="empty-state">
+                  <MatrixBackground />
+                  <span className="empty-state-icon"><FlaskConical size={32} strokeWidth={1.5} /></span>
+                  <span className="empty-state-title">Pick a file to begin</span>
+                  <span className="empty-state-hint">Your next experiment is one click away.</span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="terminal-container">
             <div className="terminal-header pane-header">

@@ -1,78 +1,55 @@
-import { useEditorStore, LspMode, AutocompleteMode, TextSizeMode, ColorMode, ThemePreference, CodeEditingMode, CodeVisibilityMode } from '../../store/editorStore';
+import { useEditorStore, ThemePreference } from '../../store/editorStore';
+import { useAgentStore } from '../../store/agentStore';
 
 interface PreferencesProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Helper to get status indicator
+function StatusBadge({ mode }: { mode: 'positive' | 'neutral' | 'negative' | string }) {
+  const labels: Record<string, { text: string; className: string }> = {
+    positive: { text: 'BLESSED', className: 'status-positive' },
+    neutral: { text: 'LOCKED', className: 'status-neutral' },
+    negative: { text: 'CURSED', className: 'status-negative' },
+    lsp: { text: 'BLESSED', className: 'status-positive' },
+    off: { text: 'LOCKED', className: 'status-neutral' },
+    random: { text: 'CURSED', className: 'status-negative' },
+    visible: { text: 'NORMAL', className: 'status-neutral' },
+    invisible: { text: 'CURSED', className: 'status-negative' },
+  };
+  const { text, className } = labels[mode] || { text: mode.toUpperCase(), className: 'status-neutral' };
+  return <span className={`status-badge ${className}`}>{text}</span>;
+}
+
 export function Preferences({ isOpen, onClose }: PreferencesProps) {
   const {
     lspMode,
-    setLspMode,
     autocompleteMode,
     autocompleteQuota,
-    setAutocompleteMode,
-    setAutocompleteQuota,
     textSizeMode,
-    setTextSizeMode,
     colorMode,
-    setColorMode,
     themePreference,
     setThemePreference,
     codeEditingMode,
     codeEditingQuota,
-    setCodeEditingMode,
-    setCodeEditingQuota,
     codeVisibilityMode,
-    setCodeVisibilityMode,
+    aspectRatioMode,
+    gitMode,
   } = useEditorStore();
+
+  const { state: agentState, quota: agentQuota } = useAgentStore();
 
   if (!isOpen) return null;
 
-  const handleLspModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLspMode(e.target.value as LspMode);
-  };
-
-  const handleAutocompleteModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setAutocompleteMode(e.target.value as AutocompleteMode);
-  };
-
-  const handleAutocompleteQuotaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setAutocompleteQuota(value);
-    }
-  };
-
-  const handleTextSizeModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTextSizeMode(e.target.value as TextSizeMode);
-  };
-
-  const handleColorModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setColorMode(e.target.value as ColorMode);
-  };
+  // Theme selection only available when colorMode is 'positive' (blessing)
+  const canSelectTheme = colorMode === 'positive';
 
   const handleThemePreferenceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setThemePreference(e.target.value as ThemePreference);
-  };
-
-  const handleCodeEditingModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCodeEditingMode(e.target.value as CodeEditingMode);
-  };
-
-  const handleCodeEditingQuotaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setCodeEditingQuota(value);
+    if (canSelectTheme) {
+      setThemePreference(e.target.value as ThemePreference);
     }
   };
-
-  const handleCodeVisibilityModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCodeVisibilityMode(e.target.value as CodeVisibilityMode);
-  };
-
-  // Theme selection is only available in positive or neutral mode
-  const canSelectTheme = colorMode !== 'negative';
 
   return (
     <div className="preferences-overlay" onClick={onClose}>
@@ -85,70 +62,62 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
         </div>
 
         <div className="preferences-content">
-          {/* Language Server Settings */}
+          <div className="preferences-notice">
+            Settings are controlled by the Gacha system. Pull lootboxes to unlock blessings or risk curses!
+          </div>
+
+          {/* Language Server */}
           <div className="preferences-section">
             <h3>Language Server</h3>
-
             <div className="preferences-row">
-              <span className="preferences-label">LSP Mode</span>
-              <select
-                className="preferences-select"
-                value={lspMode}
-                onChange={handleLspModeChange}
-              >
-                <option value="lsp">Enabled</option>
-                <option value="off">Disabled</option>
-                <option value="random">Random</option>
-              </select>
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={lspMode} />
+            </div>
+            <div className="preferences-row disabled">
+              <span className="preferences-label">Current</span>
+              <span className="preferences-value">
+                {lspMode === 'lsp' ? 'Full LSP Active' : lspMode === 'off' ? 'Disabled' : 'Random Chaos'}
+              </span>
             </div>
           </div>
 
-          {/* Autocomplete Settings */}
+          {/* Autocomplete */}
           <div className="preferences-section">
             <h3>Autocomplete</h3>
-
             <div className="preferences-row">
-              <span className="preferences-label">Mode</span>
-              <select
-                className="preferences-select"
-                value={autocompleteMode}
-                onChange={handleAutocompleteModeChange}
-              >
-                <option value="positive">Enabled (uses quota)</option>
-                <option value="neutral">Disabled</option>
-                <option value="negative">Cursed</option>
-              </select>
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={autocompleteMode} />
             </div>
-
-            <div className="preferences-row">
+            <div className="preferences-row disabled">
               <span className="preferences-label">Quota</span>
-              <input
-                type="number"
-                min="0"
-                className="preferences-input"
-                value={autocompleteQuota}
-                onChange={handleAutocompleteQuotaChange}
-              />
+              <span className="preferences-value">
+                {autocompleteMode === 'positive' ? `${autocompleteQuota} tokens` : autocompleteMode === 'neutral' ? 'Disabled' : 'Passive-aggressive mode'}
+              </span>
             </div>
           </div>
 
-          {/* Appearance Settings */}
+          {/* Code Editing */}
+          <div className="preferences-section">
+            <h3>Code Editing</h3>
+            <div className="preferences-row">
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={codeEditingMode} />
+            </div>
+            <div className="preferences-row disabled">
+              <span className="preferences-label">Quota</span>
+              <span className="preferences-value">
+                {codeEditingMode === 'positive' ? `${codeEditingQuota} chars` : codeEditingMode === 'neutral' ? 'Read-only' : 'Random deletions active'}
+              </span>
+            </div>
+          </div>
+
+          {/* Appearance */}
           <div className="preferences-section">
             <h3>Appearance</h3>
-
             <div className="preferences-row">
               <span className="preferences-label">Color Mode</span>
-              <select
-                className="preferences-select"
-                value={colorMode}
-                onChange={handleColorModeChange}
-              >
-                <option value="positive">Normal</option>
-                <option value="neutral">Normal</option>
-                <option value="negative">Eye Pain</option>
-              </select>
+              <StatusBadge mode={colorMode} />
             </div>
-
             <div className={`preferences-row ${!canSelectTheme ? 'disabled' : ''}`}>
               <span className="preferences-label">Theme</span>
               {canSelectTheme ? (
@@ -161,82 +130,74 @@ export function Preferences({ isOpen, onClose }: PreferencesProps) {
                   <option value="light">Light</option>
                 </select>
               ) : (
-                <span className="preferences-value eye-pain-label">Eye Pain (locked)</span>
-              )}
-            </div>
-
-            <div className="preferences-row">
-              <span className="preferences-label">Code Visibility</span>
-              <select
-                className="preferences-select"
-                value={codeVisibilityMode}
-                onChange={handleCodeVisibilityModeChange}
-              >
-                <option value="visible">Visible</option>
-                <option value="invisible">Invisible</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Code Editing Settings */}
-          <div className="preferences-section">
-            <h3>Code Editing</h3>
-
-            <div className="preferences-row">
-              <span className="preferences-label">Mode</span>
-              <select
-                className="preferences-select"
-                value={codeEditingMode}
-                onChange={handleCodeEditingModeChange}
-              >
-                <option value="positive">Enabled (uses quota)</option>
-                <option value="neutral">Read-only</option>
-                <option value="negative">Cursed (random deletes)</option>
-              </select>
-            </div>
-
-            <div className={`preferences-row ${codeEditingMode !== 'positive' ? 'disabled' : ''}`}>
-              <span className="preferences-label">Quota</span>
-              {codeEditingMode === 'positive' ? (
-                <input
-                  type="number"
-                  min="0"
-                  className="preferences-input"
-                  value={codeEditingQuota}
-                  onChange={handleCodeEditingQuotaChange}
-                />
-              ) : (
                 <span className="preferences-value">
-                  {codeEditingMode === 'neutral' ? 'N/A' : 'Unlimited chaos'}
+                  {colorMode === 'negative' ? 'Eye Pain (cursed)' : 'Light mode only'}
                 </span>
               )}
             </div>
+            <div className="preferences-row">
+              <span className="preferences-label">Code Visibility</span>
+              <StatusBadge mode={codeVisibilityMode} />
+            </div>
           </div>
 
-          {/* Editor Settings */}
+          {/* Text Size */}
           <div className="preferences-section">
-            <h3>Editor</h3>
-
+            <h3>Text Size</h3>
             <div className="preferences-row">
-              <span className="preferences-label">Font Size</span>
-              <select
-                className="preferences-select"
-                value={textSizeMode}
-                onChange={handleTextSizeModeChange}
-              >
-                <option value="neutral">Normal (14px)</option>
-                <option value="negative">Tiny (6px)</option>
-              </select>
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={textSizeMode} />
             </div>
-
             <div className="preferences-row disabled">
-              <span className="preferences-label">Word Wrap</span>
-              <span className="preferences-value">On</span>
+              <span className="preferences-label">Size</span>
+              <span className="preferences-value">
+                {textSizeMode === 'positive' ? 'Adjustable' : textSizeMode === 'neutral' ? '14px (fixed)' : '6px (tiny)'}
+              </span>
             </div>
+          </div>
 
+          {/* Aspect Ratio */}
+          <div className="preferences-section">
+            <h3>Aspect Ratio</h3>
+            <div className="preferences-row">
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={aspectRatioMode} />
+            </div>
             <div className="preferences-row disabled">
-              <span className="preferences-label">Minimap</span>
-              <span className="preferences-value">On</span>
+              <span className="preferences-label">Current</span>
+              <span className="preferences-value">
+                {aspectRatioMode === 'positive' ? '16:9 Normal' : aspectRatioMode === 'neutral' ? '1:1 Square' : 'Distorted'}
+              </span>
+            </div>
+          </div>
+
+          {/* Git */}
+          <div className="preferences-section">
+            <h3>Git Integration</h3>
+            <div className="preferences-row">
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={gitMode} />
+            </div>
+            <div className="preferences-row disabled">
+              <span className="preferences-label">Current</span>
+              <span className="preferences-value">
+                {gitMode === 'positive' ? 'Full access' : gitMode === 'neutral' ? 'Disabled' : 'Destructive ops active!'}
+              </span>
+            </div>
+          </div>
+
+          {/* Agent Panel */}
+          <div className="preferences-section">
+            <h3>AI Agent</h3>
+            <div className="preferences-row">
+              <span className="preferences-label">Status</span>
+              <StatusBadge mode={agentState} />
+            </div>
+            <div className="preferences-row disabled">
+              <span className="preferences-label">Current</span>
+              <span className="preferences-value">
+                {agentState === 'positive' ? `AI Active (${agentQuota} tokens)` : agentState === 'neutral' ? 'Disabled' : 'Ad space mode'}
+              </span>
             </div>
           </div>
         </div>

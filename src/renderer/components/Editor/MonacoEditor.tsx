@@ -330,48 +330,80 @@ export function MonacoEditor() {
         }
       }
 
-      // Handle negative mode - random line deletion when a line is added
-      if (editMode === 'negative' && currentLineCount > previousLineCountRef.current && previousLineCountRef.current > 0) {
-        // A line was added - delete a random line!
-        const lineToDelete = Math.floor(Math.random() * currentLineCount) + 1;
-
-        // Don't delete the only line
-        if (currentLineCount > 1) {
+      // Handle negative mode - random deletions on ANY change (50% chance)
+      if (editMode === 'negative' && !isInternalChange.current) {
+        if (Math.random() < 0.50) {
           isInternalChange.current = true;
+          const deletionType = Math.random();
 
-          // Get the range of the line to delete (including the newline)
-          const lineContent = model.getLineContent(lineToDelete);
-          const lineLength = lineContent.length;
+          if (deletionType < 0.33) {
+            // Type 1: Delete a random character elsewhere in the file
+            const totalLines = model.getLineCount();
+            const randomLine = Math.floor(Math.random() * totalLines) + 1;
+            const lineContent = model.getLineContent(randomLine);
+            if (lineContent.length > 0) {
+              const randomCol = Math.floor(Math.random() * lineContent.length) + 1;
+              editor.executeEdits('cursed-delete', [{
+                range: {
+                  startLineNumber: randomLine,
+                  startColumn: randomCol,
+                  endLineNumber: randomLine,
+                  endColumn: randomCol + 1,
+                },
+                text: '',
+              }]);
+              console.log(`Cursed! Deleted char at ${randomLine}:${randomCol}`);
+            }
+          } else if (deletionType < 0.66) {
+            // Type 2: Delete an entire random line
+            if (currentLineCount > 1) {
+              const lineToDelete = Math.floor(Math.random() * currentLineCount) + 1;
+              const lineContent = model.getLineContent(lineToDelete);
+              const lineLength = lineContent.length;
 
-          let range: monaco.IRange;
-          if (lineToDelete === currentLineCount) {
-            // Last line - delete from end of previous line
-            range = {
-              startLineNumber: lineToDelete - 1,
-              startColumn: model.getLineMaxColumn(lineToDelete - 1),
-              endLineNumber: lineToDelete,
-              endColumn: lineLength + 1,
-            };
+              let range: monaco.IRange;
+              if (lineToDelete === currentLineCount) {
+                // Last line - delete from end of previous line
+                range = {
+                  startLineNumber: lineToDelete - 1,
+                  startColumn: model.getLineMaxColumn(lineToDelete - 1),
+                  endLineNumber: lineToDelete,
+                  endColumn: lineLength + 1,
+                };
+              } else {
+                // Not last line - delete entire line including newline
+                range = {
+                  startLineNumber: lineToDelete,
+                  startColumn: 1,
+                  endLineNumber: lineToDelete + 1,
+                  endColumn: 1,
+                };
+              }
+
+              editor.executeEdits('cursed-delete', [{
+                range,
+                text: '',
+              }]);
+              console.log(`Cursed! Deleted line ${lineToDelete}: "${lineContent.substring(0, 30)}..."`);
+            }
           } else {
-            // Not last line - delete entire line including newline
-            range = {
-              startLineNumber: lineToDelete,
-              startColumn: 1,
-              endLineNumber: lineToDelete + 1,
-              endColumn: 1,
-            };
+            // Type 3: Delete the character just typed
+            const position = editor.getPosition();
+            if (position && position.column > 1) {
+              editor.executeEdits('cursed-delete', [{
+                range: {
+                  startLineNumber: position.lineNumber,
+                  startColumn: position.column - 1,
+                  endLineNumber: position.lineNumber,
+                  endColumn: position.column,
+                },
+                text: '',
+              }]);
+              console.log('Cursed! Deleted the char you just typed!');
+            }
           }
 
-          // Apply the edit
-          editor.executeEdits('cursed-delete', [{
-            range,
-            text: '',
-          }]);
-
           isInternalChange.current = false;
-
-          // Show a toast-like message (log for now)
-          console.log(`Cursed! Deleted line ${lineToDelete}: "${lineContent.substring(0, 30)}..."`);
         }
       }
 
