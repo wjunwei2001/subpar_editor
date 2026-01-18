@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20000;
+  z-index: 100000;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -343,6 +343,23 @@ body.modal-open {
   box-shadow: 0 0 40px rgba(255, 152, 0, 0.3);
 }
 
+.shop-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.shop-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shop-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 152, 0, 0.3);
+  border-radius: 4px;
+}
+
+.shop-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 152, 0, 0.5);
+}
+
 .shop-header {
   text-align: center;
   margin-bottom: 24px;
@@ -379,7 +396,7 @@ body.modal-open {
   display: flex;
   gap: 24px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   margin-bottom: 32px;
   flex-wrap: wrap;
   padding: 0 20px;
@@ -483,6 +500,7 @@ body.modal-open {
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 16px;
+  margin-top: auto;
   text-align: center;
   width: 100%;
   box-sizing: border-box;
@@ -524,6 +542,11 @@ body.modal-open {
   transition: all 0.2s;
   margin-top: auto;
   box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
 }
 
 .purchase-button:hover {

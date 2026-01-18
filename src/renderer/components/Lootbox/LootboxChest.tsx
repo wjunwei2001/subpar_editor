@@ -22,10 +22,10 @@ export function LootboxChest({ phase, rarity, lootboxType }: LootboxChestProps) 
   return (
     <motion.div
       className="lootbox-chest-container"
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8, y: 50 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       style={{ '--rarity-color': rarityColor } as React.CSSProperties}
     >
       {/* Glow behind chest */}

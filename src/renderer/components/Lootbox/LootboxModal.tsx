@@ -160,24 +160,28 @@ export function LootboxModal() {
             </div>
           )}
 
-          <AnimatePresence mode="wait">
-            {(animationPhase === 'anticipation' || animationPhase === 'opening' || animationPhase === 'reveal') && (
-              <LootboxChest
-                key="chest"
-                phase={animationPhase}
-                rarity={currentPull?.rarity || 'common'}
-                lootboxType={currentPull?.lootboxType || 'basic'}
-              />
-            )}
+          {animationPhase !== 'idle' && (
+            <div className="lootbox-animation-area">
+              <AnimatePresence mode="wait">
+                {(animationPhase === 'anticipation' || animationPhase === 'opening' || animationPhase === 'reveal') && (
+                  <LootboxChest
+                    key="chest"
+                    phase={animationPhase}
+                    rarity={currentPull?.rarity || 'common'}
+                    lootboxType={currentPull?.lootboxType || 'basic'}
+                  />
+                )}
 
-            {animationPhase === 'result' && currentPull && (
-              <LootboxResult
-                key="result"
-                pull={currentPull}
-                onClaim={claimReward}
-              />
-            )}
-          </AnimatePresence>
+                {animationPhase === 'result' && currentPull && (
+                  <LootboxResult
+                    key="result"
+                    pull={currentPull}
+                    onClaim={claimReward}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

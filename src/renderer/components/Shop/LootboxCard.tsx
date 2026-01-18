@@ -79,7 +79,7 @@ export function LootboxCard({
         {isPurchasing ? (
           <><Check size={14} /> Purchased!</>
         ) : (
-          'Buy Now'
+          'BUY NOW!'
         )}
       </button>
     </div>
