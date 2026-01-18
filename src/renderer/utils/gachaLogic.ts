@@ -17,6 +17,7 @@ import {
   getRandomBadge,
   getNegativeEffect,
 } from './effectPools';
+import { isDemoMode, getNextDemoPull } from './demoSequence';
 
 // Weighted random selection
 function weightedRandom<T extends string>(weights: Record<T, number>): T {
@@ -75,6 +76,11 @@ export function performGachaPull(
   lootboxType: LootboxType,
   hasBadLuck: boolean = false
 ): GachaPull {
+  // Demo mode: return predetermined pull sequence
+  if (isDemoMode()) {
+    return getNextDemoPull();
+  }
+
   // 1. Determine rarity
   const rarity = determineRarity(lootboxType);
 

@@ -1,5 +1,13 @@
 /// <reference types="vite/client" />
 
+interface ImportMetaEnv {
+  readonly VITE_DEMO_MODE: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 declare module 'monaco-editor/esm/vs/editor/editor.worker?worker' {
   const WorkerFactory: new () => Worker;
   export default WorkerFactory;

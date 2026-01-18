@@ -11,6 +11,12 @@ import type {
 import { performGachaPull } from '../utils/gachaLogic';
 import { applyEffect, removeEffect } from '../utils/effectApplicator';
 import { META_CURSE_CONFIG } from '@shared/gachaConfig';
+import {
+  isDemoMode,
+  getDemoIndex,
+  getDemoTotal,
+  resetDemoSequence,
+} from '../utils/demoSequence';
 
 // Animation phases for the lootbox UI
 type AnimationPhase = 'idle' | 'anticipation' | 'opening' | 'reveal' | 'result';
@@ -78,6 +84,11 @@ interface GachaState {
   // Dev mode
   devAddLootboxes: (amount: number) => void;
   devClearAll: () => void;
+
+  // Demo mode
+  isDemoMode: () => boolean;
+  getDemoProgress: () => { current: number; total: number };
+  resetDemo: () => void;
 }
 
 export const useGachaStore = create<GachaState>()(
@@ -389,6 +400,19 @@ export const useGachaStore = create<GachaState>()(
           hasImmunity: false,
           immunityExpiresAt: null,
         }),
+
+      // Demo mode helpers
+      isDemoMode: () => isDemoMode(),
+      getDemoProgress: () => ({ current: getDemoIndex(), total: getDemoTotal() }),
+      resetDemo: () => {
+        resetDemoSequence();
+        // Also reset effects and state for clean demo
+        get().devClearAll();
+        // Give enough lootboxes for the demo
+        set({
+          inventory: { basic: 10, premium: 10, legendary: 10 },
+        });
+      },
     }),
     {
       name: 'gacha-store',
